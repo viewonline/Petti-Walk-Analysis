@@ -12,6 +12,7 @@ export interface Analysis {
   petId: string;
   date: string;
   averageRom: number;
+  bcs: number;
   status: "good" | "attention" | "critical";
   label: string;
   note: string;
@@ -41,6 +42,7 @@ export const mockAnalyses: Analysis[] = [
     petId: "pet-1",
     date: "2024년 10월 24일",
     averageRom: 132,
+    bcs: 5.6,
     status: "good",
     label: "수술 후 회복 3단계",
     note: "이동성이 안정적입니다. 무릎 굴곡이 지난달보다 4% 개선되었습니다.",
@@ -53,6 +55,7 @@ export const mockAnalyses: Analysis[] = [
     petId: "pet-1",
     date: "2024년 10월 12일",
     averageRom: 128,
+    bcs: 5.5,
     status: "good",
     label: "수술 후 회복 2단계",
     note: "꾸준한 회복세를 보이고 있습니다. 좌우 균형이 향상되었습니다.",
@@ -65,6 +68,7 @@ export const mockAnalyses: Analysis[] = [
     petId: "pet-1",
     date: "2024년 9월 28일",
     averageRom: 115,
+    bcs: 5.4,
     status: "attention",
     label: "초기 기준 검사",
     note: "초기 관절 가동 범위가 제한적입니다. 물리치료를 권장합니다.",
@@ -77,6 +81,7 @@ export const mockAnalyses: Analysis[] = [
     petId: "pet-1",
     date: "2024년 9월 14일",
     averageRom: 110,
+    bcs: 5.2,
     status: "attention",
     label: "연간 건강 검진",
     note: "보행 시 약간의 비대칭이 관찰됩니다. 추적 관찰이 필요합니다.",
@@ -89,6 +94,7 @@ export const mockAnalyses: Analysis[] = [
     petId: "pet-1",
     date: "2024년 8월 30일",
     averageRom: 120,
+    bcs: 5.0,
     status: "good",
     label: "정기 검진",
     note: "전반적인 보행 상태가 양호합니다.",

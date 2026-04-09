@@ -94,9 +94,10 @@ export default function HistoryScreen() {
                   )}
                   <View style={styles.romRow}>
                     {[
-                      { label: "좌측 ROM", value: a.leftRom },
-                      { label: "우측 ROM", value: a.rightRom },
-                      { label: "평균 ROM", value: a.averageRom },
+                      { label: "좌측 ROM", value: `${a.leftRom}°`, accent: colors.primary },
+                      { label: "우측 ROM", value: `${a.rightRom}°`, accent: colors.primary },
+                      { label: "평균 ROM", value: `${a.averageRom}°`, accent: colors.primary },
+                      { label: "BCS", value: a.bcs.toFixed(1), accent: colors.secondary },
                     ].map((r, i) => (
                       <View
                         key={i}
@@ -108,8 +109,8 @@ export default function HistoryScreen() {
                         <Text style={[styles.romLabel, { color: colors.mutedForeground }]}>
                           {r.label}
                         </Text>
-                        <Text style={[styles.romValue, { color: colors.primary }]}>
-                          {r.value}°
+                        <Text style={[styles.romValue, { color: r.accent }]}>
+                          {r.value}
                         </Text>
                       </View>
                     ))}
