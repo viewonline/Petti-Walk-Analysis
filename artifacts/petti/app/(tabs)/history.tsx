@@ -194,10 +194,12 @@ const styles = StyleSheet.create({
   },
   romRow: {
     flexDirection: "row",
+    flexWrap: "wrap",
     gap: 8,
   },
   romBox: {
-    flex: 1,
+    flexBasis: "47%",
+    flexGrow: 1,
     borderRadius: 12,
     padding: 12,
     alignItems: "center",
