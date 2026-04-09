@@ -13,6 +13,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useColors } from "@/hooks/useColors";
 import { AnalysisCard } from "@/components/AnalysisCard";
 import { TrendChart } from "@/components/TrendChart";
+import { PettiTalk } from "@/components/PettiTalk";
 import { mockAnalyses, mockTrend, Analysis } from "@/data/mockData";
 
 export default function HistoryScreen() {
@@ -29,88 +30,100 @@ export default function HistoryScreen() {
   };
 
   return (
-    <ScrollView
-      style={[styles.root, { backgroundColor: colors.background }]}
-      contentContainerStyle={[
-        styles.content,
-        {
-          paddingTop: topPad + 12,
-          paddingBottom: insets.bottom + bottomPad + 100,
-        },
-      ]}
-      showsVerticalScrollIndicator={false}
-    >
-      {/* Header */}
-      <View style={styles.headerRow}>
-        <View style={[styles.logoCircle, { backgroundColor: colors.primaryFixed }]}>
-          <Feather name="activity" size={18} color={colors.primary} />
+    <View style={[styles.root, { backgroundColor: colors.background }]}>
+      <ScrollView
+        contentContainerStyle={[
+          styles.content,
+          {
+            paddingTop: topPad + 12,
+            paddingBottom: insets.bottom + bottomPad + 120,
+          },
+        ]}
+        showsVerticalScrollIndicator={false}
+      >
+        {/* Header */}
+        <View style={styles.headerRow}>
+          <View style={[styles.logoCircle, { backgroundColor: colors.primaryFixed }]}>
+            <Feather name="activity" size={18} color={colors.primary} />
+          </View>
+          <Text style={[styles.appName, { color: colors.primary }]}>Petti</Text>
+          <View style={styles.logoCircle} />
         </View>
-        <Text style={[styles.appName, { color: colors.primary }]}>Petti</Text>
-        <View style={styles.logoCircle} />
-      </View>
 
-      {/* Title */}
-      <View>
-        <Text style={[styles.screenTitle, { color: colors.foreground }]}>
-          분석 기록
-        </Text>
-        <Text style={[styles.screenSub, { color: colors.mutedForeground }]}>
-          {mockAnalyses.length}건의 분석 결과
-        </Text>
-      </View>
+        {/* Title */}
+        <View>
+          <Text style={[styles.screenTitle, { color: colors.foreground }]}>
+            분석 기록
+          </Text>
+          <Text style={[styles.screenSub, { color: colors.mutedForeground }]}>
+            {mockAnalyses.length}건의 분석 결과
+          </Text>
+        </View>
 
-      {/* Trend Chart */}
-      <TrendChart data={mockTrend} />
+        {/* Trend Chart — dual lines */}
+        <TrendChart data={mockTrend} />
 
-      {/* Analyses list */}
-      <View style={styles.listSection}>
-        {mockAnalyses.map((a) => (
-          <View key={a.id}>
-            <AnalysisCard
-              analysis={a}
-              onPress={() => selectAnalysis(a)}
-            />
-            {selected?.id === a.id && (
-              <View
-                style={[
-                  styles.detailCard,
-                  { backgroundColor: colors.surfaceContainerLow },
-                ]}
-              >
-                <Text style={[styles.detailTitle, { color: colors.primary }]}>
-                  분석 상세
-                </Text>
-                <Text style={[styles.detailNote, { color: colors.mutedForeground }]}>
-                  {a.note}
-                </Text>
-                <View style={styles.romRow}>
-                  {[
-                    { label: "좌측 ROM", value: a.leftRom },
-                    { label: "우측 ROM", value: a.rightRom },
-                    { label: "평균 ROM", value: a.averageRom },
-                  ].map((r, i) => (
-                    <View
-                      key={i}
-                      style={[
-                        styles.romBox,
-                        { backgroundColor: colors.surfaceContainerHighest },
-                      ]}
-                    >
-                      <Text style={[styles.romLabel, { color: colors.mutedForeground }]}>
-                        {r.label}
-                      </Text>
-                      <Text style={[styles.romValue, { color: colors.primary }]}>
-                        {r.value}°
+        {/* Analyses list */}
+        <View style={styles.listSection}>
+          {mockAnalyses.map((a) => (
+            <View key={a.id}>
+              <AnalysisCard
+                analysis={a}
+                onPress={() => selectAnalysis(a)}
+              />
+              {selected?.id === a.id && (
+                <View
+                  style={[
+                    styles.detailCard,
+                    { backgroundColor: colors.surfaceContainerLow },
+                  ]}
+                >
+                  <Text style={[styles.detailTitle, { color: colors.primary }]}>
+                    분석 상세
+                  </Text>
+                  <Text style={[styles.detailNote, { color: colors.mutedForeground }]}>
+                    {a.note}
+                  </Text>
+                  {a.compensationPattern && (
+                    <View style={[styles.patternBox, { backgroundColor: colors.secondaryFixed }]}>
+                      <Feather name="alert-circle" size={13} color={colors.secondary} />
+                      <Text style={[styles.patternText, { color: colors.secondary }]}>
+                        {a.compensationPattern}
                       </Text>
                     </View>
-                  ))}
+                  )}
+                  <View style={styles.romRow}>
+                    {[
+                      { label: "좌측 ROM", value: a.leftRom },
+                      { label: "우측 ROM", value: a.rightRom },
+                      { label: "평균 ROM", value: a.averageRom },
+                    ].map((r, i) => (
+                      <View
+                        key={i}
+                        style={[
+                          styles.romBox,
+                          { backgroundColor: colors.surfaceContainerHighest },
+                        ]}
+                      >
+                        <Text style={[styles.romLabel, { color: colors.mutedForeground }]}>
+                          {r.label}
+                        </Text>
+                        <Text style={[styles.romValue, { color: colors.primary }]}>
+                          {r.value}°
+                        </Text>
+                      </View>
+                    ))}
+                  </View>
                 </View>
-              </View>
-            )}
-          </View>
-        ))}
-      </View>
-    </ScrollView>
+              )}
+            </View>
+          ))}
+        </View>
+      </ScrollView>
+
+      {/* PettiTalk floating button */}
+      <PettiTalk latestAnalysis={mockAnalyses[0]} />
+    </View>
   );
 }
 
@@ -164,6 +177,19 @@ const styles = StyleSheet.create({
   detailNote: {
     fontSize: 13,
     lineHeight: 18,
+  },
+  patternBox: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+    borderRadius: 10,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+  },
+  patternText: {
+    fontSize: 12,
+    fontWeight: "600",
+    flex: 1,
   },
   romRow: {
     flexDirection: "row",
