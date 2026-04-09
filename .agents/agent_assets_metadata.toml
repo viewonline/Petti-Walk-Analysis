@@ -1,0 +1,8 @@
+uploads = []
+outputs = []
+
+[[generated]]
+id = "D03tp0DmDvrB_xapYnj2m"
+uri = "file://artifacts/petti/assets/images/icon.png"
+type = "image"
+title = "petti app icon"

@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Video Recording Guide - Clinical Sanctuary</title>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Plus+Jakarta+Sans:wght@700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "tertiary-container": "#5b7984",
+                    "on-error": "#ffffff",
+                    "on-tertiary-fixed": "#001f27",
+                    "on-secondary-container": "#783d01",
+                    "error": "#ba1a1a",
+                    "secondary-fixed-dim": "#ffb780",
+                    "secondary": "#8e4e14",
+                    "surface-container-high": "#e5e9e9",
+                    "primary": "#00676a",
+                    "on-error-container": "#93000a",
+                    "tertiary-fixed": "#c8e8f4",
+                    "on-tertiary": "#ffffff",
+                    "surface-container-low": "#f0f4f4",
+                    "on-surface": "#181c1d",
+                    "primary-fixed-dim": "#83d4d7",
+                    "inverse-on-surface": "#edf2f1",
+                    "surface-bright": "#f6fafa",
+                    "secondary-fixed": "#ffdcc4",
+                    "on-primary": "#ffffff",
+                    "surface-container": "#eaefee",
+                    "outline": "#6e7979",
+                    "surface-container-highest": "#dfe3e3",
+                    "background": "#f6fafa",
+                    "tertiary-fixed-dim": "#adcbd7",
+                    "inverse-primary": "#83d4d7",
+                    "on-primary-container": "#f2ffff",
+                    "surface-dim": "#d6dbdb",
+                    "tertiary": "#43606a",
+                    "on-tertiary-container": "#fafdff",
+                    "surface": "#f6fafa",
+                    "error-container": "#ffdad6",
+                    "on-secondary": "#ffffff",
+                    "primary-container": "#298083",
+                    "surface-variant": "#dfe3e3",
+                    "primary-fixed": "#9ff0f3",
+                    "on-secondary-fixed": "#2f1400",
+                    "on-primary-fixed": "#002021",
+                    "on-background": "#181c1d",
+                    "outline-variant": "#bec9c9",
+                    "secondary-container": "#ffab69",
+                    "surface-tint": "#00696c",
+                    "surface-container-lowest": "#ffffff",
+                    "on-secondary-fixed-variant": "#6f3800",
+                    "inverse-surface": "#2c3131",
+                    "on-primary-fixed-variant": "#004f52",
+                    "on-tertiary-fixed-variant": "#2e4b55",
+                    "on-surface-variant": "#3e4949"
+            },
+            "borderRadius": {
+                    "DEFAULT": "1rem",
+                    "lg": "2rem",
+                    "xl": "3rem",
+                    "full": "9999px"
+            },
+            "fontFamily": {
+                    "headline": ["Plus Jakarta Sans"],
+                    "body": ["Inter"],
+                    "label": ["Inter"]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .perspective-1000 { perspective: 1000px; }
+        .glass-ui {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-surface font-body selection:bg-primary-container/30">
+<!-- Top Navigation Anchor (Shared Component Mapping) -->
+<header class="bg-[#f6fafa] dark:bg-slate-950 flex justify-between items-center w-full px-6 py-4 fixed top-0 z-50">
+<div class="flex items-center gap-3">
+<button class="w-10 h-10 rounded-full bg-surface-container-low flex items-center justify-center hover:opacity-80 transition-opacity active:scale-95">
+<span class="material-symbols-outlined text-primary">close</span>
+</button>
+</div>
+<h1 class="text-xl font-extrabold text-[#00676a] dark:text-teal-500 font-headline tracking-tight">Clinical Sanctuary</h1>
+<div class="w-10 h-10 rounded-full overflow-hidden bg-surface-container-highest">
+<img alt="Pet Profile" class="w-full h-full object-cover" data-alt="Close up portrait of a golden retriever smiling in soft outdoor sunlight with greenery in background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBHpUPiiOyVR8-HCiWPHCmeXw9YwRNos0MQj9kIbq7brMukvFZWfFgKbAQEYGArxW-_ukHJ-lSib3c8wceBxqkeVmWMEetBck_QTDJq5rOmS_8BqHYImg81xx6-YVhFLpO0Rk44vEl7X7RPfzGAlUL-dV5wwtIoTkK0GmHaTepO759cdgR_U0xpeyuILQC7jVXWWGHc-BrQ1716io1-LYSYhvp5cbYF8J0dXecg_7c90GE9m9PkV3O9ybmRWEPP5O1M2TNRXNfqA9I"/>
+</div>
+</header>
+<main class="pt-24 pb-32 px-6 max-w-2xl mx-auto space-y-8">
+<!-- Step 1: Instructional Bento Card -->
+<section class="space-y-4">
+<div class="flex items-center justify-between">
+<div>
+<span class="text-secondary font-bold tracking-widest text-[10px] uppercase block mb-1">Phase 01</span>
+<h2 class="text-2xl font-headline font-bold text-primary tracking-tight">Positioning Guide</h2>
+</div>
+<div class="bg-secondary-fixed text-on-secondary-fixed px-3 py-1 rounded-full text-xs font-semibold">
+                    Step 1 of 2
+                </div>
+</div>
+<div class="bg-surface-container-low rounded-lg p-6 relative overflow-hidden group">
+<div class="relative z-10 grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
+<div class="space-y-3">
+<p class="text-on-surface-variant leading-relaxed">
+                            Position your dog facing <span class="font-bold text-on-surface">left</span>. Keep the camera at <span class="font-bold text-on-surface">knee height</span> for the most accurate gait analysis.
+                        </p>
+<div class="flex gap-2">
+<span class="bg-surface-container-highest p-2 rounded-md">
+<span class="material-symbols-outlined text-primary">height</span>
+<span class="text-[10px] font-bold block mt-1">Knee Lvl</span>
+</span>
+<span class="bg-surface-container-highest p-2 rounded-md">
+<span class="material-symbols-outlined text-primary">straighten</span>
+<span class="text-[10px] font-bold block mt-1">6 Feet</span>
+</span>
+</div>
+</div>
+<div class="aspect-square bg-surface-container-highest rounded-lg overflow-hidden relative border-outline-variant/10 border shadow-sm">
+<img alt="Recording Illustration" class="w-full h-full object-cover grayscale opacity-80 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-700" data-alt="Minimalist instructional photo of a person holding a smartphone at knee level filming a dog standing on a clean white floor facing left" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBo65scV8Yt5eS4A0_yE-WMZeLh8jVJ3CFSiiPUVCzIa979AYOGjt-z8nO98mcOF5cvJzMQ4z6H0J4Bou2eTJOBVNHgGLiLF7Vq1sNuZtqU7Vjmw6M_eBLSaT5UeCKFlHe5c-bqi2hfcUZGo9Tza4mTKR7ZJnidRYJhVE0ZGgORuQrDFX26f405yY7doNC6yUzc5AfabZYGuEUZfthOjOBWKeCoNm8jJWGrhi9wJRfqSo71WPys0OeOyPr7tRGRPRzqvCupNk4-Glw"/>
+<div class="absolute inset-0 bg-gradient-to-t from-primary/20 to-transparent"></div>
+<div class="absolute bottom-3 left-3 bg-white/90 px-2 py-1 rounded text-[10px] font-bold text-primary flex items-center gap-1">
+<span class="material-symbols-outlined text-[12px]" data-weight="fill">check_circle</span> Correct Angle
+                        </div>
+</div>
+</div>
+</div>
+</section>
+<!-- Step 2: Live Camera Interface Simulation -->
+<section class="space-y-4">
+<h2 class="text-2xl font-headline font-bold text-primary tracking-tight">Camera Interface</h2>
+<div class="relative aspect-[9/16] w-full max-w-sm mx-auto rounded-xl overflow-hidden shadow-2xl bg-black border-4 border-surface-container-highest">
+<!-- Camera Feed Simulation -->
+<img alt="Camera Feed" class="w-full h-full object-cover opacity-90" data-alt="Side view of a border collie standing on a hardwood floor, viewed through a mobile camera lens with soft indoor lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC7WevBCTaSLXPONl1Wrz9ydF1Hri4y10zxjgN8AJUsUAYMuKl-4g3BUA35Jqxbonv1iiJol-UEViorlKAAncQ1ComDdmrgqpINhXh9AkyhPs7bs9-WLWkt9cGoiwusz2k1Wctt7QTHPkClSr1Z-AqEiwvkuTqGN3O0QfzefIvITHZ1rCM0gfinA47LtJFoZV1rbnkDUhfqfb_xPCYZJ8jdKaHqeVoCqfqqw_L8rWCva86R9pHmN1YmGGKlaTDU44Abh-2DG2ZHS14"/>
+<!-- UI Overlays -->
+<div class="absolute inset-0 flex flex-col justify-between p-6 pointer-events-none">
+<!-- Top Bar: Timer & State -->
+<div class="flex justify-between items-start pointer-events-auto">
+<div class="glass-ui px-4 py-2 rounded-full flex items-center gap-2">
+<div class="w-2 h-2 rounded-full bg-error animate-pulse"></div>
+<span class="text-white font-mono text-sm font-bold tracking-widest">00:12 / 00:15</span>
+</div>
+<button class="glass-ui w-10 h-10 rounded-full flex items-center justify-center text-white">
+<span class="material-symbols-outlined">flash_on</span>
+</button>
+</div>
+<!-- Alignment Guide: Semi-transparent Outline -->
+<div class="absolute inset-0 flex items-center justify-center">
+<svg class="w-4/5 h-1/2 text-white/40" fill="none" stroke="currentColor" stroke-dasharray="4 4" stroke-width="1.5" viewbox="0 0 200 100">
+<!-- Schematic dog outline for alignment -->
+<path d="M40,80 L60,80 M140,80 L160,80 M100,20 Q140,20 160,50 L160,80 Q100,90 40,80 L40,50 Q60,20 100,20"></path>
+<circle cx="50" cy="85" fill="currentColor" r="3"></circle>
+<circle cx="150" cy="85" fill="currentColor" r="3"></circle>
+</svg>
+<div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 glass-ui px-3 py-1 rounded-full text-[10px] text-white font-bold uppercase tracking-widest">
+                            Align Legs Here
+                        </div>
+</div>
+<!-- Bottom Controls -->
+<div class="space-y-6 pointer-events-auto">
+<!-- Side Toggle -->
+<div class="flex justify-center">
+<div class="bg-black/40 p-1 rounded-full backdrop-blur-md flex gap-1 border border-white/10">
+<button class="bg-primary text-white px-4 py-1.5 rounded-full text-xs font-bold transition-all">Left Side</button>
+<button class="text-white/60 hover:text-white px-4 py-1.5 rounded-full text-xs font-bold transition-all">Right Side</button>
+</div>
+</div>
+<!-- Recording Button and Progress -->
+<div class="flex flex-col items-center gap-4">
+<div class="relative w-20 h-20 flex items-center justify-center">
+<svg class="absolute inset-0 w-full h-full -rotate-90">
+<circle class="stroke-white/20 fill-none" cx="40" cy="40" r="36" stroke-width="4"></circle>
+<circle class="stroke-primary fill-none" cx="40" cy="40" r="36" stroke-dasharray="226" stroke-dashoffset="45" stroke-width="4"></circle>
+</svg>
+<div class="w-14 h-14 bg-error rounded-xl flex items-center justify-center">
+<div class="w-4 h-4 bg-white rounded-sm"></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Recording Progress Bar at very bottom -->
+<div class="absolute bottom-0 left-0 w-full h-1.5 bg-white/20">
+<div class="h-full bg-primary w-[80%]"></div>
+</div>
+</div>
+</section>
+<!-- Step 3: Finish / Upload State -->
+<section class="space-y-6">
+<div class="bg-surface-container-lowest border border-outline-variant/10 rounded-lg p-8 text-center space-y-4 shadow-sm">
+<div class="relative inline-block">
+<div class="w-20 h-20 bg-primary-fixed rounded-full flex items-center justify-center mx-auto">
+<span class="material-symbols-outlined text-primary text-4xl" data-weight="fill">cloud_upload</span>
+</div>
+<!-- Upload Progress Ripple -->
+<div class="absolute -inset-2 border-2 border-primary/20 rounded-full animate-ping"></div>
+</div>
+<div class="space-y-2">
+<h3 class="text-xl font-headline font-bold text-on-surface">Uploading Capture</h3>
+<p class="text-on-surface-variant text-sm px-8">Analyzing biomechanical markers and gait symmetry...</p>
+</div>
+<div class="w-full bg-surface-container-low h-3 rounded-full overflow-hidden">
+<div class="bg-gradient-to-r from-primary to-primary-container h-full w-3/4 rounded-full transition-all duration-1000 ease-in-out"></div>
+</div>
+<div class="flex justify-between text-[11px] font-bold text-primary px-1">
+<span>75% Complete</span>
+<span class="text-on-surface-variant">4.2MB / 5.6MB</span>
+</div>
+</div>
+<button class="w-full bg-gradient-to-br from-[#00676a] to-[#298083] text-white py-4 rounded-xl font-bold font-headline shadow-lg shadow-primary/20 hover:opacity-90 active:scale-95 transition-all">
+                Finalize Walk Session
+            </button>
+</section>
+</main>
+<!-- Bottom Navigation Shell (Shared Component Mapping) -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 pb-6 pt-3 bg-white/85 dark:bg-slate-900/85 backdrop-blur-xl shadow-[0_-12px_24px_rgba(24,28,29,0.05)] rounded-t-[3rem]">
+<a class="flex flex-col items-center justify-center text-[#5b7984] dark:text-slate-500 px-5 py-2 hover:text-[#00676a] transition-all duration-300" href="#">
+<span class="material-symbols-outlined">home</span>
+<span class="font-['Inter'] text-[11px] font-semibold mt-1">Home</span>
+</a>
+<a class="flex flex-col items-center justify-center bg-gradient-to-br from-[#00676a] to-[#298083] text-white rounded-full px-5 py-2 transition-all duration-300" href="#">
+<span class="material-symbols-outlined" data-weight="fill">videocam</span>
+<span class="font-['Inter'] text-[11px] font-semibold mt-1">Camera</span>
+</a>
+<a class="flex flex-col items-center justify-center text-[#5b7984] dark:text-slate-500 px-5 py-2 hover:text-[#00676a] transition-all duration-300" href="#">
+<span class="material-symbols-outlined">history</span>
+<span class="font-['Inter'] text-[11px] font-semibold mt-1">History</span>
+</a>
+<a class="flex flex-col items-center justify-center text-[#5b7984] dark:text-slate-500 px-5 py-2 hover:text-[#00676a] transition-all duration-300" href="#">
+<span class="material-symbols-outlined">pets</span>
+<span class="font-['Inter'] text-[11px] font-semibold mt-1">Profile</span>
+</a>
+</nav>
+</body></html>
