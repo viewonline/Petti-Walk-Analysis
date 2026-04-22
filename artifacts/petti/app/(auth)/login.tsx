@@ -170,7 +170,13 @@ export default function LoginScreen() {
           <Text style={[styles.footerText, { color: colors.mutedForeground }]}>
             아직 계정이 없으신가요?
           </Text>
-          <TouchableOpacity onPress={() => Haptics.selectionAsync()}>
+          <TouchableOpacity
+            onPress={() => {
+              Haptics.selectionAsync();
+              router.push("/(auth)/signup");
+            }}
+            activeOpacity={0.7}
+          >
             <Text style={[styles.signupText, { color: colors.primary }]}>
               회원가입
             </Text>
