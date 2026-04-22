@@ -20,15 +20,32 @@ import { useAuth } from "@/context/AuthContext";
 const GENDER_OPTIONS = ["수컷", "암컷"] as const;
 const NEUTERED_OPTIONS = ["했음", "안했음"] as const;
 
+const CONCERN_OPTIONS = [
+  "퇴행성 관절염", "슬개골 탈구", "기관지협", "비만", "세균성/식이성 설사",
+  "외이염(급성)", "유루증", "치은염/치주염", "피부사상균증", "방광염",
+  "소양증", "외이염(만성)", "장염(급성 포함)", "피부염(감염성)", "피부염(아토피성)", "피부질환",
+];
+
+const FOOD_OPTIONS = [
+  "호흡기건강", "피모/모질 개선", "포만감/기호성", "치석예방/제거", "저지방",
+  "기능 개선", "영양공급", "알러지 예방/완화", "심장 건강", "소화력/식욕 증진",
+  "면역력 향상", "눈 건강(눈물,시력)", "노화예방", "근력강화", "관절/뼈 도움",
+  "다이어트", "성장발육", "스트레스/분리불안", "귀 건강", "피부개선",
+];
+
 const FIELDS = [
-  { key: "name" as keyof PetInfo, icon: "tag", label: "이름", unit: "" },
-  { key: "breed" as keyof PetInfo, icon: "activity", label: "견종", unit: "" },
-  { key: "gender" as keyof PetInfo, icon: "users", label: "성별", unit: "" },
-  { key: "neutered" as keyof PetInfo, icon: "shield", label: "중성화 여부", unit: "" },
-  { key: "age" as keyof PetInfo, icon: "calendar", label: "나이", unit: "살" },
-  { key: "weight" as keyof PetInfo, icon: "trending-up", label: "체중", unit: "kg" },
-  { key: "owner" as keyof PetInfo, icon: "user", label: "견주", unit: "" },
-  { key: "hospital" as keyof PetInfo, icon: "map-pin", label: "동물병원", unit: "" },
+  { key: "name" as keyof PetInfo, icon: "tag", label: "이름", unit: "", type: "text" },
+  { key: "breed" as keyof PetInfo, icon: "activity", label: "견종", unit: "", type: "text" },
+  { key: "gender" as keyof PetInfo, icon: "users", label: "성별", unit: "", type: "toggle" },
+  { key: "neutered" as keyof PetInfo, icon: "shield", label: "중성화 여부", unit: "", type: "toggle" },
+  { key: "age" as keyof PetInfo, icon: "calendar", label: "나이", unit: "살", type: "text" },
+  { key: "weight" as keyof PetInfo, icon: "trending-up", label: "체중", unit: "kg", type: "text" },
+  { key: "owner" as keyof PetInfo, icon: "user", label: "견주", unit: "", type: "text" },
+  { key: "hospital" as keyof PetInfo, icon: "map-pin", label: "동물병원", unit: "", type: "text" },
+  { key: "birthdate" as keyof PetInfo, icon: "calendar", label: "생년월일", unit: "", type: "text" },
+  { key: "regNumber" as keyof PetInfo, icon: "hash", label: "동물 등록 번호", unit: "", type: "text" },
+  { key: "concerns" as keyof PetInfo, icon: "alert-circle", label: "걱정되는 질병", unit: "", type: "multiselect" },
+  { key: "foods" as keyof PetInfo, icon: "package", label: "관심있는 기능성 사료", unit: "", type: "multiselect" },
 ];
 
 const SETTINGS = [
@@ -71,6 +88,16 @@ export default function ProfileScreen() {
 
   const setField = (key: keyof PetInfo, value: string) => {
     setDraft((prev) => ({ ...prev, [key]: value }));
+  };
+
+  const toggleArrayField = (key: "concerns" | "foods", value: string, max: number) => {
+    Haptics.selectionAsync();
+    setDraft((prev) => {
+      const arr = (prev[key] as string[]) || [];
+      if (arr.includes(value)) return { ...prev, [key]: arr.filter((v) => v !== value) };
+      if (arr.length >= max) return prev;
+      return { ...prev, [key]: [...arr, value] };
+    });
   };
 
   return (
@@ -159,105 +186,125 @@ export default function ProfileScreen() {
         </View>
 
         {FIELDS.map((f, i) => {
-          const isToggleField = f.key === "gender" || f.key === "neutered";
-          const toggleOptions = f.key === "gender" ? GENDER_OPTIONS : NEUTERED_OPTIONS;
           const isLast = i === FIELDS.length - 1;
-          if (isToggleField && editing) {
+          const divider = !isLast ? { borderBottomWidth: 1, borderBottomColor: colors.border + "30" } : {};
+
+          // Toggle fields (gender, neutered)
+          if (f.type === "toggle") {
+            const toggleOptions = f.key === "gender" ? GENDER_OPTIONS : NEUTERED_OPTIONS;
             return (
-              <View
-                key={f.key}
-                style={[
-                  styles.infoRow,
-                  { flexDirection: "column", alignItems: "flex-start", gap: 10 },
-                  !isLast && { borderBottomWidth: 1, borderBottomColor: colors.border + "30" },
-                ]}
-              >
+              <View key={f.key} style={[styles.infoRow, { flexDirection: "column", alignItems: "flex-start", gap: 10 }, divider]}>
                 <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
                   <View style={[styles.infoIcon, { backgroundColor: colors.surfaceContainerLow }]}>
                     <Feather name={f.icon as any} size={16} color={colors.primary} />
                   </View>
                   <Text style={[styles.infoLabel, { color: colors.mutedForeground }]}>{f.label}</Text>
                 </View>
-                <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 8, paddingBottom: 4 }}>
-                  {toggleOptions.map((opt) => {
-                    const selected = draft[f.key] === opt;
-                    return (
-                      <TouchableOpacity
-                        key={opt}
-                        onPress={() => setField(f.key, opt)}
-                        style={[
-                          styles.genderBtn,
-                          {
-                            backgroundColor: selected ? colors.primary : colors.surfaceContainerLow,
-                            borderColor: selected ? colors.primary : colors.border,
-                          },
-                        ]}
-                        activeOpacity={0.75}
-                      >
-                        <Text
-                          style={[
-                            styles.genderBtnText,
-                            { color: selected ? "#fff" : colors.mutedForeground },
-                          ]}
+                {editing ? (
+                  <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 8, paddingBottom: 4 }}>
+                    {toggleOptions.map((opt) => {
+                      const selected = draft[f.key] === opt;
+                      return (
+                        <TouchableOpacity
+                          key={opt}
+                          onPress={() => setField(f.key, opt)}
+                          style={[styles.genderBtn, { backgroundColor: selected ? colors.primary : colors.surfaceContainerLow, borderColor: selected ? colors.primary : colors.border }]}
+                          activeOpacity={0.75}
                         >
-                          {opt}
-                        </Text>
-                      </TouchableOpacity>
-                    );
-                  })}
-                </View>
+                          <Text style={[styles.genderBtnText, { color: selected ? "#fff" : colors.mutedForeground }]}>{opt}</Text>
+                        </TouchableOpacity>
+                      );
+                    })}
+                  </View>
+                ) : (
+                  <Text style={[styles.infoValue, { color: colors.foreground, paddingBottom: 4 }]}>
+                    {String(petInfo[f.key] || "—")}
+                  </Text>
+                )}
               </View>
             );
           }
+
+          // Multi-select fields (concerns, foods)
+          if (f.type === "multiselect") {
+            const allOptions = f.key === "concerns" ? CONCERN_OPTIONS : FOOD_OPTIONS;
+            const selectedArr = (editing ? draft[f.key] : petInfo[f.key]) as string[];
+            const max = 3;
+            return (
+              <View key={f.key} style={[styles.infoRow, { flexDirection: "column", alignItems: "flex-start", gap: 10 }, divider]}>
+                <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
+                  <View style={[styles.infoIcon, { backgroundColor: colors.surfaceContainerLow }]}>
+                    <Feather name={f.icon as any} size={16} color={colors.primary} />
+                  </View>
+                  <Text style={[styles.infoLabel, { color: colors.mutedForeground }]}>{f.label}</Text>
+                  {editing && (
+                    <Text style={[styles.maxHint, { color: colors.outlineVariant }]}>최대 {max}개</Text>
+                  )}
+                </View>
+                {editing ? (
+                  <View style={[styles.tagGrid, { paddingBottom: 4 }]}>
+                    {allOptions.map((opt) => {
+                      const isSelected = selectedArr.includes(opt);
+                      const isDisabled = !isSelected && selectedArr.length >= max;
+                      return (
+                        <TouchableOpacity
+                          key={opt}
+                          onPress={() => toggleArrayField(f.key as "concerns" | "foods", opt, max)}
+                          style={[
+                            styles.tagBtn,
+                            {
+                              backgroundColor: isSelected ? colors.primary : colors.surfaceContainerLow,
+                              borderColor: isSelected ? colors.primary : isDisabled ? colors.border + "50" : colors.border,
+                              opacity: isDisabled ? 0.45 : 1,
+                            },
+                          ]}
+                          activeOpacity={0.75}
+                          disabled={isDisabled}
+                        >
+                          <Text style={[styles.tagText, { color: isSelected ? "#fff" : colors.foreground }]}>{opt}</Text>
+                        </TouchableOpacity>
+                      );
+                    })}
+                  </View>
+                ) : (
+                  <View style={[styles.tagGrid, { paddingBottom: 4 }]}>
+                    {selectedArr.length > 0 ? selectedArr.map((opt) => (
+                      <View key={opt} style={[styles.tagBtn, { backgroundColor: colors.primaryFixed, borderColor: colors.primary + "40" }]}>
+                        <Text style={[styles.tagText, { color: colors.primary }]}>{opt}</Text>
+                      </View>
+                    )) : (
+                      <Text style={[styles.infoValue, { color: colors.outlineVariant }]}>—</Text>
+                    )}
+                  </View>
+                )}
+              </View>
+            );
+          }
+
+          // Text fields
           return (
-            <View
-              key={f.key}
-              style={[
-                styles.infoRow,
-                !isLast && {
-                  borderBottomWidth: 1,
-                  borderBottomColor: colors.border + "30",
-                },
-              ]}
-            >
+            <View key={f.key} style={[styles.infoRow, divider]}>
               <View style={[styles.infoIcon, { backgroundColor: colors.surfaceContainerLow }]}>
                 <Feather name={f.icon as any} size={16} color={colors.primary} />
               </View>
-              <Text style={[styles.infoLabel, { color: colors.mutedForeground }]}>
-                {f.label}
-              </Text>
+              <Text style={[styles.infoLabel, { color: colors.mutedForeground }]}>{f.label}</Text>
               {editing ? (
                 <View style={styles.inputWrap}>
                   <TextInput
-                    style={[
-                      styles.inlineInput,
-                      {
-                        color: colors.foreground,
-                        backgroundColor: colors.surfaceContainerLow,
-                        borderColor: colors.primary + "60",
-                      },
-                    ]}
-                    value={draft[f.key]}
+                    style={[styles.inlineInput, { color: colors.foreground, backgroundColor: colors.surfaceContainerLow, borderColor: colors.primary + "60" }]}
+                    value={String(draft[f.key] || "")}
                     onChangeText={(v) => setField(f.key, v)}
-                    keyboardType={
-                      f.key === "age"
-                        ? "numeric"
-                        : f.key === "weight"
-                        ? "decimal-pad"
-                        : "default"
-                    }
+                    keyboardType={f.key === "age" ? "numeric" : f.key === "weight" ? "decimal-pad" : "default"}
                     returnKeyType="done"
                     selectTextOnFocus
                   />
                   {f.unit !== "" && (
-                    <Text style={[styles.unitText, { color: colors.mutedForeground }]}>
-                      {f.unit}
-                    </Text>
+                    <Text style={[styles.unitText, { color: colors.mutedForeground }]}>{f.unit}</Text>
                   )}
                 </View>
               ) : (
                 <Text style={[styles.infoValue, { color: colors.foreground }]}>
-                  {petInfo[f.key]}{f.unit !== "" ? ` ${f.unit}` : ""}
+                  {String(petInfo[f.key] || "—")}{f.unit !== "" ? ` ${f.unit}` : ""}
                 </Text>
               )}
             </View>
@@ -460,6 +507,10 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontWeight: "500",
   },
+  tagGrid: { flexDirection: "row", flexWrap: "wrap", gap: 6 },
+  tagBtn: { paddingHorizontal: 10, paddingVertical: 5, borderRadius: 8, borderWidth: 1 },
+  tagText: { fontSize: 12, fontWeight: "500" },
+  maxHint: { fontSize: 10, fontWeight: "500" },
   saveFullBtn: {
     flexDirection: "row",
     alignItems: "center",

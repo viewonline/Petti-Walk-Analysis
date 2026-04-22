@@ -9,6 +9,10 @@ export interface PetInfo {
   weight: string;
   owner: string;
   hospital: string;
+  birthdate: string;
+  regNumber: string;
+  concerns: string[];
+  foods: string[];
 }
 
 const DEFAULT_PET: PetInfo = {
@@ -20,6 +24,10 @@ const DEFAULT_PET: PetInfo = {
   weight: "28.5",
   owner: "김민준",
   hospital: "행복 동물병원",
+  birthdate: "",
+  regNumber: "",
+  concerns: [],
+  foods: [],
 };
 
 interface PetContextValue {
