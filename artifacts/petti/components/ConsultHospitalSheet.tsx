@@ -58,10 +58,36 @@ const SPECIALTY_COLORS: Record<string, { bg: string; fg: string }> = {
   치과: { bg: "#e8eaf6", fg: "#283593" },
 };
 
+const REPORT_ITEMS = [
+  { key: "gait", label: "보행 분석 리포트", sub: "ROM · BCS · 상태 요약", icon: "file-text" as const },
+  { key: "video", label: "관절 스켈레톤 영상", sub: "AI 분석 시각화 영상 링크", icon: "film" as const },
+  { key: "note", label: "임상 소견 메모", sub: "수의사 전달용 요약 노트", icon: "clipboard" as const },
+];
+
+const MOCK_DATES = (() => {
+  const days = ["오늘", "내일", "모레"];
+  const slots = ["10:00", "13:00", "15:00", "17:00"];
+  const now = new Date();
+  return days.map((label, i) => {
+    const d = new Date(now);
+    d.setDate(now.getDate() + i);
+    const mmdd = `${d.getMonth() + 1}/${d.getDate()}`;
+    const dow = ["일", "월", "화", "수", "목", "금", "토"][d.getDay()];
+    return { label, mmdd, dow, slots };
+  });
+})();
+
 export function ConsultHospitalSheet({ visible, onClose, analysis, colors }: Props) {
   const [activeFilter, setActiveFilter] = useState<Specialty | "전체">("전체");
   const [searchQuery, setSearchQuery] = useState("");
   const [bookmarked, setBookmarked] = useState<Set<string>>(new Set());
+  const [reportHospital, setReportHospital] = useState<ConsultHospital | null>(null);
+  const [reportChecked, setReportChecked] = useState<Set<string>>(new Set(["gait"]));
+  const [reportSent, setReportSent] = useState<Set<string>>(new Set());
+  const [bookingHospital, setBookingHospital] = useState<ConsultHospital | null>(null);
+  const [bookingDate, setBookingDate] = useState(0);
+  const [bookingSlot, setBookingSlot] = useState<string | null>(null);
+  const [booked, setBooked] = useState<Set<string>>(new Set());
   const insets = useSafeAreaInsets();
   const tabBarH = Platform.OS === "web" ? 84 : 49;
   const scrollBottomPad = insets.bottom + tabBarH + 16;
@@ -304,18 +330,44 @@ export function ConsultHospitalSheet({ visible, onClose, analysis, colors }: Pro
                   {/* Action buttons */}
                   <View style={styles.actionRow}>
                     <TouchableOpacity
-                      style={[styles.reportBtn, { borderColor: colors.primary + "70" }]}
+                      style={[
+                        styles.reportBtn,
+                        {
+                          borderColor: reportSent.has(h.id) ? colors.primary : colors.primary + "70",
+                          backgroundColor: reportSent.has(h.id) ? colors.primaryFixed : "transparent",
+                        },
+                      ]}
                       activeOpacity={0.75}
+                      onPress={() => {
+                        Haptics.selectionAsync();
+                        setReportChecked(new Set(["gait"]));
+                        setReportHospital(h);
+                      }}
                     >
-                      <Feather name="file-text" size={14} color={colors.primary} />
-                      <Text style={[styles.reportBtnText, { color: colors.primary }]}>리포트 전송</Text>
+                      <Feather name={reportSent.has(h.id) ? "check" : "file-text"} size={14} color={colors.primary} />
+                      <Text style={[styles.reportBtnText, { color: colors.primary }]}>
+                        {reportSent.has(h.id) ? "전송 완료" : "리포트 전송"}
+                      </Text>
                     </TouchableOpacity>
                     <TouchableOpacity
-                      style={[styles.bookBtn, { backgroundColor: colors.primary }]}
+                      style={[
+                        styles.bookBtn,
+                        {
+                          backgroundColor: booked.has(h.id) ? colors.primaryContainer : colors.primary,
+                        },
+                      ]}
                       activeOpacity={0.85}
+                      onPress={() => {
+                        Haptics.selectionAsync();
+                        setBookingDate(0);
+                        setBookingSlot(null);
+                        setBookingHospital(h);
+                      }}
                     >
-                      <Feather name="calendar" size={14} color="#fff" />
-                      <Text style={styles.bookBtnText}>예약하기</Text>
+                      <Feather name={booked.has(h.id) ? "check-circle" : "calendar"} size={14} color="#fff" />
+                      <Text style={styles.bookBtnText}>
+                        {booked.has(h.id) ? "예약 완료" : "예약하기"}
+                      </Text>
                     </TouchableOpacity>
                   </View>
                 </View>
@@ -324,6 +376,218 @@ export function ConsultHospitalSheet({ visible, onClose, analysis, colors }: Pro
           </View>
         </ScrollView>
       </View>
+
+      {/* ── Report Send Sub-sheet ── */}
+      {reportHospital && (
+        <View style={[StyleSheet.absoluteFill, { zIndex: 70 }]}>
+          <Pressable style={styles.subBackdrop} onPress={() => setReportHospital(null)} />
+          <View style={[styles.subSheet, { backgroundColor: colors.background }]}>
+            <View style={[styles.subHandle, { backgroundColor: colors.border }]} />
+            <View style={[styles.subHeader, { borderBottomColor: colors.border + "40" }]}>
+              <View style={[styles.subHeaderIcon, { backgroundColor: colors.primaryFixed }]}>
+                <Feather name="file-text" size={15} color={colors.primary} />
+              </View>
+              <View style={{ flex: 1 }}>
+                <Text style={[styles.subTitle, { color: colors.foreground }]}>리포트 전송</Text>
+                <Text style={[styles.subSub, { color: colors.mutedForeground }]} numberOfLines={1}>
+                  {reportHospital.name}
+                </Text>
+              </View>
+              <TouchableOpacity onPress={() => setReportHospital(null)} hitSlop={10}>
+                <Feather name="x" size={20} color={colors.mutedForeground} />
+              </TouchableOpacity>
+            </View>
+
+            <View style={styles.subBody}>
+              <Text style={[styles.subLabel, { color: colors.mutedForeground }]}>
+                전송할 항목을 선택하세요
+              </Text>
+              {REPORT_ITEMS.map((item) => {
+                const checked = reportChecked.has(item.key);
+                return (
+                  <TouchableOpacity
+                    key={item.key}
+                    style={[
+                      styles.reportItem,
+                      {
+                        backgroundColor: checked ? colors.primaryFixed + "80" : colors.surfaceContainerLow,
+                        borderColor: checked ? colors.primary + "50" : colors.border + "40",
+                        borderWidth: checked ? 1.5 : 1,
+                      },
+                    ]}
+                    onPress={() => {
+                      Haptics.selectionAsync();
+                      setReportChecked((prev) => {
+                        const next = new Set(prev);
+                        next.has(item.key) ? next.delete(item.key) : next.add(item.key);
+                        return next;
+                      });
+                    }}
+                    activeOpacity={0.75}
+                  >
+                    <View style={[styles.subCheckbox, { backgroundColor: checked ? colors.primary : "transparent", borderColor: checked ? colors.primary : colors.border }]}>
+                      {checked && <Feather name="check" size={12} color="#fff" />}
+                    </View>
+                    <View style={[styles.reportItemIcon, { backgroundColor: checked ? colors.primaryFixed : colors.surfaceContainerLow }]}>
+                      <Feather name={item.icon} size={16} color={checked ? colors.primary : colors.mutedForeground} />
+                    </View>
+                    <View style={{ flex: 1 }}>
+                      <Text style={[styles.reportItemLabel, { color: colors.foreground }]}>{item.label}</Text>
+                      <Text style={[styles.reportItemSub, { color: colors.mutedForeground }]}>{item.sub}</Text>
+                    </View>
+                  </TouchableOpacity>
+                );
+              })}
+            </View>
+
+            <View style={[styles.subFooter, { borderTopColor: colors.border + "40", paddingBottom: insets.bottom + tabBarH }]}>
+              <TouchableOpacity
+                style={[styles.subCancelBtn, { borderColor: colors.border }]}
+                onPress={() => setReportHospital(null)}
+                activeOpacity={0.75}
+              >
+                <Text style={[styles.subCancelText, { color: colors.mutedForeground }]}>취소</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[
+                  styles.subConfirmBtn,
+                  {
+                    backgroundColor: reportChecked.size > 0 ? colors.primary : colors.surfaceContainerLow,
+                    opacity: reportChecked.size > 0 ? 1 : 0.5,
+                  },
+                ]}
+                activeOpacity={0.85}
+                disabled={reportChecked.size === 0}
+                onPress={() => {
+                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+                  setReportSent((prev) => new Set(prev).add(reportHospital.id));
+                  setReportHospital(null);
+                }}
+              >
+                <Feather name="send" size={14} color="#fff" />
+                <Text style={styles.subConfirmText}>
+                  {reportChecked.size > 0 ? `${reportChecked.size}개 전송하기` : "항목 선택"}
+                </Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      )}
+
+      {/* ── Booking Sub-sheet ── */}
+      {bookingHospital && (
+        <View style={[StyleSheet.absoluteFill, { zIndex: 70 }]}>
+          <Pressable style={styles.subBackdrop} onPress={() => setBookingHospital(null)} />
+          <View style={[styles.subSheet, { backgroundColor: colors.background }]}>
+            <View style={[styles.subHandle, { backgroundColor: colors.border }]} />
+            <View style={[styles.subHeader, { borderBottomColor: colors.border + "40" }]}>
+              <View style={[styles.subHeaderIcon, { backgroundColor: colors.primaryFixed }]}>
+                <Feather name="calendar" size={15} color={colors.primary} />
+              </View>
+              <View style={{ flex: 1 }}>
+                <Text style={[styles.subTitle, { color: colors.foreground }]}>예약하기</Text>
+                <Text style={[styles.subSub, { color: colors.mutedForeground }]} numberOfLines={1}>
+                  {bookingHospital.name}
+                </Text>
+              </View>
+              <TouchableOpacity onPress={() => setBookingHospital(null)} hitSlop={10}>
+                <Feather name="x" size={20} color={colors.mutedForeground} />
+              </TouchableOpacity>
+            </View>
+
+            <View style={styles.subBody}>
+              {/* Date selector */}
+              <Text style={[styles.subLabel, { color: colors.mutedForeground }]}>날짜 선택</Text>
+              <View style={styles.dateRow}>
+                {MOCK_DATES.map((d, idx) => {
+                  const active = bookingDate === idx;
+                  return (
+                    <TouchableOpacity
+                      key={idx}
+                      style={[
+                        styles.dateChip,
+                        {
+                          backgroundColor: active ? colors.primary : colors.surfaceContainerLow,
+                          borderColor: active ? colors.primary : colors.border + "60",
+                        },
+                      ]}
+                      onPress={() => { Haptics.selectionAsync(); setBookingDate(idx); setBookingSlot(null); }}
+                      activeOpacity={0.75}
+                    >
+                      <Text style={[styles.dateChipLabel, { color: active ? "#fff" : colors.mutedForeground }]}>{d.label}</Text>
+                      <Text style={[styles.dateChipDate, { color: active ? "rgba(255,255,255,0.8)" : colors.mutedForeground }]}>{d.mmdd} ({d.dow})</Text>
+                    </TouchableOpacity>
+                  );
+                })}
+              </View>
+
+              {/* Time slots */}
+              <Text style={[styles.subLabel, { color: colors.mutedForeground, marginTop: 8 }]}>시간 선택</Text>
+              <View style={styles.slotGrid}>
+                {MOCK_DATES[bookingDate].slots.map((slot) => {
+                  const active = bookingSlot === slot;
+                  return (
+                    <TouchableOpacity
+                      key={slot}
+                      style={[
+                        styles.slotChip,
+                        {
+                          backgroundColor: active ? colors.primary : colors.surfaceContainerLow,
+                          borderColor: active ? colors.primary : colors.border + "60",
+                        },
+                      ]}
+                      onPress={() => { Haptics.selectionAsync(); setBookingSlot(slot); }}
+                      activeOpacity={0.75}
+                    >
+                      <Text style={[styles.slotText, { color: active ? "#fff" : colors.foreground }]}>{slot}</Text>
+                    </TouchableOpacity>
+                  );
+                })}
+              </View>
+
+              {bookingSlot && (
+                <View style={[styles.bookingSummary, { backgroundColor: colors.primaryFixed + "70", borderColor: colors.primary + "30" }]}>
+                  <Feather name="check-circle" size={14} color={colors.primary} />
+                  <Text style={[styles.bookingSummaryText, { color: colors.primary }]}>
+                    {MOCK_DATES[bookingDate].mmdd} ({MOCK_DATES[bookingDate].dow}) {bookingSlot} 예약 확정 예정
+                  </Text>
+                </View>
+              )}
+            </View>
+
+            <View style={[styles.subFooter, { borderTopColor: colors.border + "40", paddingBottom: insets.bottom + tabBarH }]}>
+              <TouchableOpacity
+                style={[styles.subCancelBtn, { borderColor: colors.border }]}
+                onPress={() => setBookingHospital(null)}
+                activeOpacity={0.75}
+              >
+                <Text style={[styles.subCancelText, { color: colors.mutedForeground }]}>취소</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[
+                  styles.subConfirmBtn,
+                  {
+                    backgroundColor: bookingSlot ? colors.primary : colors.surfaceContainerLow,
+                    opacity: bookingSlot ? 1 : 0.5,
+                  },
+                ]}
+                activeOpacity={0.85}
+                disabled={!bookingSlot}
+                onPress={() => {
+                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+                  setBooked((prev) => new Set(prev).add(bookingHospital.id));
+                  setBookingHospital(null);
+                }}
+              >
+                <Feather name="calendar" size={14} color="#fff" />
+                <Text style={styles.subConfirmText}>
+                  {bookingSlot ? "예약 확정하기" : "시간을 선택하세요"}
+                </Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      )}
     </View>
   );
 }
@@ -520,4 +784,130 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
   },
   bookBtnText: { fontSize: 14, fontWeight: "700", color: "#fff" },
+
+  subBackdrop: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: "rgba(0,0,0,0.40)",
+  },
+  subSheet: {
+    position: "absolute",
+    bottom: 0,
+    left: 0,
+    right: 0,
+    borderTopLeftRadius: 28,
+    borderTopRightRadius: 28,
+    overflow: "hidden",
+  },
+  subHandle: {
+    width: 40,
+    height: 4,
+    borderRadius: 2,
+    alignSelf: "center",
+    marginTop: 10,
+    marginBottom: 4,
+  },
+  subHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: 18,
+    paddingVertical: 14,
+    borderBottomWidth: 1,
+    gap: 12,
+  },
+  subHeaderIcon: {
+    width: 34,
+    height: 34,
+    borderRadius: 10,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  subTitle: { fontSize: 17, fontWeight: "800", letterSpacing: -0.3 },
+  subSub: { fontSize: 12, fontWeight: "500", marginTop: 1 },
+  subBody: { padding: 18, gap: 12 },
+  subLabel: { fontSize: 12, fontWeight: "600", textTransform: "uppercase", letterSpacing: 0.4 },
+  subCheckbox: {
+    width: 22,
+    height: 22,
+    borderRadius: 7,
+    borderWidth: 1.5,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  reportItem: {
+    flexDirection: "row",
+    alignItems: "center",
+    borderRadius: 14,
+    padding: 13,
+    gap: 10,
+  },
+  reportItemIcon: {
+    width: 36,
+    height: 36,
+    borderRadius: 10,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  reportItemLabel: { fontSize: 14, fontWeight: "700", marginBottom: 2 },
+  reportItemSub: { fontSize: 11 },
+  subFooter: {
+    flexDirection: "row",
+    gap: 10,
+    paddingHorizontal: 18,
+    paddingTop: 14,
+    borderTopWidth: 1,
+  },
+  subCancelBtn: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    borderWidth: 1,
+    borderRadius: 14,
+    paddingVertical: 14,
+  },
+  subCancelText: { fontSize: 14, fontWeight: "600" },
+  subConfirmBtn: {
+    flex: 2,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 7,
+    borderRadius: 14,
+    paddingVertical: 14,
+  },
+  subConfirmText: { fontSize: 14, fontWeight: "800", color: "#fff" },
+
+  dateRow: { flexDirection: "row", gap: 8 },
+  dateChip: {
+    flex: 1,
+    alignItems: "center",
+    paddingVertical: 10,
+    borderRadius: 12,
+    borderWidth: 1,
+    gap: 3,
+  },
+  dateChipLabel: { fontSize: 13, fontWeight: "800" },
+  dateChipDate: { fontSize: 10, fontWeight: "500" },
+  slotGrid: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 8,
+  },
+  slotChip: {
+    width: "22%",
+    alignItems: "center",
+    paddingVertical: 12,
+    borderRadius: 12,
+    borderWidth: 1,
+  },
+  slotText: { fontSize: 14, fontWeight: "700" },
+  bookingSummary: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+    padding: 12,
+    borderRadius: 12,
+    borderWidth: 1,
+    marginTop: 4,
+  },
+  bookingSummaryText: { fontSize: 13, fontWeight: "600", flex: 1 },
 });
