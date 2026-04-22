@@ -23,6 +23,10 @@ function NativeTabLayout() {
         <Icon sf={{ default: "clock", selected: "clock.fill" }} />
         <Label>기록</Label>
       </NativeTabs.Trigger>
+      <NativeTabs.Trigger name="community">
+        <Icon sf={{ default: "bubble.left.and.bubble.right", selected: "bubble.left.and.bubble.right.fill" }} />
+        <Label>커뮤니티</Label>
+      </NativeTabs.Trigger>
       <NativeTabs.Trigger name="profile">
         <Icon sf={{ default: "pawprint", selected: "pawprint.fill" }} />
         <Label>프로필</Label>
@@ -98,8 +102,15 @@ function ClassicTabLayout() {
       />
       <Tabs.Screen
         name="prescription"
+        options={{ href: null }}
+      />
+      <Tabs.Screen
+        name="community"
         options={{
-          href: null,
+          title: "커뮤니티",
+          tabBarIcon: ({ color }) => (
+            <Feather name="message-circle" size={22} color={color} />
+          ),
         }}
       />
       <Tabs.Screen

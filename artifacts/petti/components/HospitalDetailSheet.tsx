@@ -2,9 +2,11 @@ import { Feather } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
 import React, { useState } from "react";
 import {
+  Linking,
   Platform,
   Pressable,
   ScrollView,
+  Share,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -100,6 +102,7 @@ function ReviewCard({ review, colors }: { review: HospitalReview; colors: ColorT
 
 export function HospitalDetailSheet({ hospital, initialTab = "info", colors, onClose, onOpenCommunity }: Props) {
   const [activeTab, setActiveTab] = useState<"info" | "reviews" | "consult">(initialTab);
+  const [saved, setSaved] = useState(false);
   const [reportChecked, setReportChecked] = useState<Set<string>>(new Set(["gait"]));
   const [reportSent, setReportSent] = useState(false);
   const [bookingType, setBookingType] = useState<"초진" | "재진">("초진");
@@ -181,24 +184,66 @@ export function HospitalDetailSheet({ hospital, initialTab = "info", colors, onC
 
         {/* ── Quick action row ── */}
         <View style={[dstyles.actionRow, { borderBottomColor: colors.border + "30" }]}>
-          {[
-            { icon: "phone" as const, label: "전화하기" },
-            { icon: "map-pin" as const, label: "위치보기" },
-            { icon: "share-2" as const, label: "공유하기" },
-            { icon: "bookmark" as const, label: "저장하기" },
-          ].map((a) => (
-            <TouchableOpacity
-              key={a.icon}
-              style={dstyles.quickAction}
-              onPress={() => Haptics.selectionAsync()}
-              activeOpacity={0.7}
-            >
-              <View style={[dstyles.quickActionIcon, { backgroundColor: colors.primaryFixed }]}>
-                <Feather name={a.icon} size={16} color={colors.primary} />
-              </View>
-              <Text style={[dstyles.quickActionLabel, { color: colors.mutedForeground }]}>{a.label}</Text>
-            </TouchableOpacity>
-          ))}
+          <TouchableOpacity
+            style={dstyles.quickAction}
+            onPress={() => {
+              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+              Linking.openURL(`tel:${hospital.phone}`);
+            }}
+            activeOpacity={0.7}
+          >
+            <View style={[dstyles.quickActionIcon, { backgroundColor: colors.primaryFixed }]}>
+              <Feather name="phone" size={16} color={colors.primary} />
+            </View>
+            <Text style={[dstyles.quickActionLabel, { color: colors.mutedForeground }]}>전화하기</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={dstyles.quickAction}
+            onPress={() => {
+              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+              Linking.openURL(`https://map.kakao.com/link/search/${encodeURIComponent(hospital.name)}`);
+            }}
+            activeOpacity={0.7}
+          >
+            <View style={[dstyles.quickActionIcon, { backgroundColor: colors.primaryFixed }]}>
+              <Feather name="map-pin" size={16} color={colors.primary} />
+            </View>
+            <Text style={[dstyles.quickActionLabel, { color: colors.mutedForeground }]}>위치보기</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={dstyles.quickAction}
+            onPress={() => {
+              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+              Share.share({
+                title: hospital.name,
+                message: `Petti 추천 병원\n${hospital.name}\n📍 ${hospital.address}\n📞 ${hospital.phone}\n⭐ ${hospital.rating} (${hospital.reviewCount}건) · Petti 매칭 ${hospital.matchScore}%`,
+              });
+            }}
+            activeOpacity={0.7}
+          >
+            <View style={[dstyles.quickActionIcon, { backgroundColor: colors.primaryFixed }]}>
+              <Feather name="share-2" size={16} color={colors.primary} />
+            </View>
+            <Text style={[dstyles.quickActionLabel, { color: colors.mutedForeground }]}>공유하기</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={dstyles.quickAction}
+            onPress={() => {
+              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+              setSaved((v) => !v);
+            }}
+            activeOpacity={0.7}
+          >
+            <View style={[dstyles.quickActionIcon, { backgroundColor: saved ? colors.primary : colors.primaryFixed }]}>
+              <Feather name={saved ? "bookmark" : "bookmark"} size={16} color={saved ? "#fff" : colors.primary} />
+            </View>
+            <Text style={[dstyles.quickActionLabel, { color: saved ? colors.primary : colors.mutedForeground }]}>
+              {saved ? "저장됨" : "저장하기"}
+            </Text>
+          </TouchableOpacity>
         </View>
 
         {/* ── Tab bar ── */}

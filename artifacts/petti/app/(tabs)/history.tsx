@@ -1,6 +1,7 @@
 import { Feather } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
 import * as Linking from "expo-linking";
+import { useRouter } from "expo-router";
 import * as Print from "expo-print";
 import * as Sharing from "expo-sharing";
 import React, { useState } from "react";
@@ -154,6 +155,7 @@ function buildPdfHtml(): string {
 export default function HistoryScreen() {
   const colors = useColors();
   const insets = useSafeAreaInsets();
+  const router = useRouter();
   const [selected, setSelected] = useState<Analysis | null>(null);
   const [pdfLoading, setPdfLoading] = useState(false);
   const [shareTarget, setShareTarget] = useState<Analysis | null>(null);
@@ -391,8 +393,10 @@ export default function HistoryScreen() {
         initialTab={detailTab}
         colors={colors}
         onClose={() => setDetailHospital(null)}
-        onOpenCommunity={(_hospitalName) => {
+        onOpenCommunity={(hospitalName) => {
           setDetailHospital(null);
+          setShowConsult(false);
+          router.push({ pathname: "/(tabs)/community", params: { hospital: hospitalName } });
         }}
       />
     </View>
