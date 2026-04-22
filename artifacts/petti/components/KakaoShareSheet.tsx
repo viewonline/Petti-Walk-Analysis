@@ -1,9 +1,10 @@
 import { Feather } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
-import React from "react";
+import React, { useState } from "react";
 import {
   Platform,
   Pressable,
+  ScrollView,
   Share,
   StyleSheet,
   Text,
@@ -18,6 +19,19 @@ const KAKAO_CHANNEL_URL = "https://pf.kakao.com/petti";
 const MOCK_VIDEO_URL = "https://petti.vet/skeleton/demo";
 const MOCK_REPORT_URL = "https://petti.vet/report/demo";
 
+interface ShareItemDef {
+  key: string;
+  icon: React.ComponentProps<typeof Feather>["name"];
+  color: string;
+  bg: string;
+  title: string;
+  desc: string;
+  badge: string;
+  /** If defined, tapping opens this action instead of toggling check */
+  actionOnly?: boolean;
+  onAction?: () => void;
+}
+
 interface Props {
   visible: boolean;
   onClose: () => void;
@@ -27,6 +41,8 @@ interface Props {
 }
 
 export function KakaoShareSheet({ visible, onClose, onOpenConsult, analysis, colors }: Props) {
+  const [checked, setChecked] = useState<Set<string>>(new Set(["video", "report"]));
+
   if (!visible || !analysis) return null;
 
   const statusLabel =
@@ -34,24 +50,77 @@ export function KakaoShareSheet({ visible, onClose, onOpenConsult, analysis, col
   const statusColor =
     analysis.status === "good" ? "#00676a" : analysis.status === "attention" ? "#8e4e14" : "#ba1a1a";
 
-  const shareText = [
-    `🐾 [Petti 보행 분석 결과]`,
-    ``,
-    `${mockPet.name}(${mockPet.breed})의 보행 분석이 완료되었습니다.`,
-    ``,
-    `📅 측정일: ${analysis.date}`,
-    `📋 검사 유형: ${analysis.label}`,
-    `📐 평균 ROM: ${analysis.averageRom}°  (좌 ${analysis.leftRom}° / 우 ${analysis.rightRom}°)`,
-    `⚖️ BCS: ${analysis.bcs.toFixed(1)}  |  상태: ${statusLabel}`,
-    ...(analysis.compensationPattern ? [`⚠ 보상 패턴: ${analysis.compensationPattern}`] : []),
-    ``,
-    `🎬 관절 스켈레톤 영상: ${MOCK_VIDEO_URL}`,
-    `📄 분석 리포트: ${MOCK_REPORT_URL}`,
-    `💬 맞춤 상담: ${KAKAO_CHANNEL_URL}`,
-  ].join("\n");
+  const ITEMS: ShareItemDef[] = [
+    {
+      key: "video",
+      icon: "film",
+      color: "#5e35b1",
+      bg: "#ede7f6",
+      title: "관절 스켈레톤 영상",
+      desc: "AI 분석으로 생성된 관절 움직임 시각화 영상",
+      badge: "영상",
+    },
+    {
+      key: "report",
+      icon: "file-text",
+      color: "#00676a",
+      bg: "#e0f2f1",
+      title: "보행 분석 리포트",
+      desc: `ROM ${analysis.averageRom}° · BCS ${analysis.bcs.toFixed(1)} · ${statusLabel}`,
+      badge: "PDF",
+    },
+    {
+      key: "consult",
+      icon: "search",
+      color: "#c17f24",
+      bg: "#fff3e0",
+      title: "맞춤 상담 병원 찾기",
+      desc: "리뷰·거리·진료과목별 병원 선택 후 카카오톡 문의",
+      badge: "병원 보기 →",
+      actionOnly: true,
+      onAction: onOpenConsult,
+    },
+  ];
+
+  const toggleCheck = (key: string) => {
+    Haptics.selectionAsync();
+    setChecked((prev) => {
+      const next = new Set(prev);
+      next.has(key) ? next.delete(key) : next.add(key);
+      return next;
+    });
+  };
+
+  const buildShareText = () => {
+    const lines: string[] = [
+      `🐾 [Petti 보행 분석 결과]`,
+      ``,
+      `${mockPet.name}(${mockPet.breed})의 보행 분석이 완료되었습니다.`,
+      ``,
+      `📅 측정일: ${analysis.date}`,
+      `📋 검사 유형: ${analysis.label}`,
+      `📐 평균 ROM: ${analysis.averageRom}°  (좌 ${analysis.leftRom}° / 우 ${analysis.rightRom}°)`,
+      `⚖️ BCS: ${analysis.bcs.toFixed(1)}  |  상태: ${statusLabel}`,
+      ...(analysis.compensationPattern ? [`⚠ 보상 패턴: ${analysis.compensationPattern}`] : []),
+      ``,
+    ];
+    if (checked.has("video")) lines.push(`🎬 관절 스켈레톤 영상: ${MOCK_VIDEO_URL}`);
+    if (checked.has("report")) lines.push(`📄 분석 리포트: ${MOCK_REPORT_URL}`);
+    if (checked.has("consult")) lines.push(`💬 맞춤 상담: ${KAKAO_CHANNEL_URL}`);
+    return lines.join("\n");
+  };
 
   const handleShare = async () => {
+    const anyChecked = checked.size > 0;
+    if (!anyChecked) {
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
+      if (Platform.OS === "web") {
+        alert("공유할 항목을 하나 이상 선택해 주세요.");
+      }
+      return;
+    }
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    const shareText = buildShareText();
     if (Platform.OS === "web") {
       try {
         await navigator.clipboard.writeText(shareText);
@@ -68,35 +137,7 @@ export function KakaoShareSheet({ visible, onClose, onOpenConsult, analysis, col
     onClose();
   };
 
-  const ITEMS = [
-    {
-      icon: "film" as const,
-      color: "#5e35b1",
-      bg: "#ede7f6",
-      title: "관절 스켈레톤 영상",
-      desc: "AI 분석으로 생성된 관절 움직임 시각화 영상",
-      badge: "영상",
-      onPress: undefined as (() => void) | undefined,
-    },
-    {
-      icon: "file-text" as const,
-      color: "#00676a",
-      bg: "#e0f2f1",
-      title: "보행 분석 리포트",
-      desc: `ROM ${analysis.averageRom}° · BCS ${analysis.bcs.toFixed(1)} · ${statusLabel}`,
-      badge: "PDF",
-      onPress: undefined as (() => void) | undefined,
-    },
-    {
-      icon: "search" as const,
-      color: "#c17f24",
-      bg: "#fff3e0",
-      title: "맞춤 상담 병원 찾기",
-      desc: "리뷰·거리·진료과목별 병원 선택 후 카카오톡 문의",
-      badge: "병원 보기 →",
-      onPress: onOpenConsult,
-    },
-  ];
+  const checkedCount = checked.size;
 
   return (
     <View style={[StyleSheet.absoluteFill, { zIndex: 50 }]}>
@@ -106,7 +147,7 @@ export function KakaoShareSheet({ visible, onClose, onOpenConsult, analysis, col
         <View style={[styles.handle, { backgroundColor: colors.border }]} />
 
         {/* Header */}
-        <View style={styles.sheetHeader}>
+        <View style={[styles.sheetHeader, { borderBottomColor: colors.border + "40" }]}>
           <View style={[styles.kakaoIcon, { backgroundColor: KAKAO_YELLOW }]}>
             <Text style={styles.kakaoIconText}>K</Text>
           </View>
@@ -118,99 +159,187 @@ export function KakaoShareSheet({ visible, onClose, onOpenConsult, analysis, col
               분석 결과를 지인이나 담당 수의사에게 전달하세요
             </Text>
           </View>
-          <TouchableOpacity onPress={onClose} style={styles.closeBtn}>
-            <Feather name="x" size={18} color={colors.mutedForeground} />
+          <TouchableOpacity onPress={onClose} style={styles.closeBtn} hitSlop={8}>
+            <Feather name="x" size={20} color={colors.mutedForeground} />
           </TouchableOpacity>
         </View>
 
-        {/* Preview card — KakaoTalk message look */}
-        <View style={[styles.previewCard, { backgroundColor: colors.surfaceContainerLow, borderColor: colors.border + "40" }]}>
-          <View style={[styles.previewBrand, { backgroundColor: colors.primaryFixed }]}>
-            <Text style={[styles.previewBrandText, { color: colors.primary }]}>Petti</Text>
-          </View>
-          <View style={styles.previewBody}>
-            <Text style={[styles.previewTitle, { color: colors.foreground }]}>
-              {mockPet.name}의 보행 분석 결과
-            </Text>
-            <Text style={[styles.previewDate, { color: colors.mutedForeground }]}>
-              {analysis.date} · {analysis.label}
-            </Text>
-            <View style={styles.previewMetrics}>
-              <View style={styles.previewMetricItem}>
-                <Text style={[styles.previewMetricVal, { color: colors.primary }]}>
-                  {analysis.averageRom}°
-                </Text>
-                <Text style={[styles.previewMetricKey, { color: colors.mutedForeground }]}>ROM</Text>
-              </View>
-              <View style={[styles.previewDivider, { backgroundColor: colors.border }]} />
-              <View style={styles.previewMetricItem}>
-                <Text style={[styles.previewMetricVal, { color: colors.primary }]}>
-                  {analysis.bcs.toFixed(1)}
-                </Text>
-                <Text style={[styles.previewMetricKey, { color: colors.mutedForeground }]}>BCS</Text>
-              </View>
-              <View style={[styles.previewDivider, { backgroundColor: colors.border }]} />
-              <View style={styles.previewMetricItem}>
-                <Text style={[styles.previewMetricVal, { color: statusColor }]}>
-                  {statusLabel}
-                </Text>
-                <Text style={[styles.previewMetricKey, { color: colors.mutedForeground }]}>상태</Text>
+        {/* ── Scrollable body ── */}
+        <ScrollView
+          style={styles.scrollArea}
+          contentContainerStyle={styles.scrollContent}
+          showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled"
+        >
+          {/* Preview card */}
+          <View style={[styles.previewCard, { backgroundColor: colors.surfaceContainerLow, borderColor: colors.border + "40" }]}>
+            <View style={[styles.previewBrand, { backgroundColor: colors.primaryFixed }]}>
+              <Text style={[styles.previewBrandText, { color: colors.primary }]}>Petti</Text>
+            </View>
+            <View style={styles.previewBody}>
+              <Text style={[styles.previewTitle, { color: colors.foreground }]}>
+                {mockPet.name}의 보행 분석 결과
+              </Text>
+              <Text style={[styles.previewDate, { color: colors.mutedForeground }]}>
+                {analysis.date} · {analysis.label}
+              </Text>
+              <View style={styles.previewMetrics}>
+                <View style={styles.previewMetricItem}>
+                  <Text style={[styles.previewMetricVal, { color: colors.primary }]}>
+                    {analysis.averageRom}°
+                  </Text>
+                  <Text style={[styles.previewMetricKey, { color: colors.mutedForeground }]}>ROM</Text>
+                </View>
+                <View style={[styles.previewDivider, { backgroundColor: colors.border }]} />
+                <View style={styles.previewMetricItem}>
+                  <Text style={[styles.previewMetricVal, { color: colors.primary }]}>
+                    {analysis.bcs.toFixed(1)}
+                  </Text>
+                  <Text style={[styles.previewMetricKey, { color: colors.mutedForeground }]}>BCS</Text>
+                </View>
+                <View style={[styles.previewDivider, { backgroundColor: colors.border }]} />
+                <View style={styles.previewMetricItem}>
+                  <Text style={[styles.previewMetricVal, { color: statusColor }]}>
+                    {statusLabel}
+                  </Text>
+                  <Text style={[styles.previewMetricKey, { color: colors.mutedForeground }]}>상태</Text>
+                </View>
               </View>
             </View>
           </View>
-        </View>
 
-        {/* Share items */}
-        <View style={styles.itemList}>
-          {ITEMS.map((item) => (
-            <TouchableOpacity
-              key={item.title}
-              style={[
-                styles.shareItem,
-                {
-                  backgroundColor: item.onPress ? "#fffbeb" : colors.surfaceContainerLow,
-                  borderColor: item.onPress ? "#f59e0b60" : colors.border + "40",
-                },
-              ]}
-              onPress={item.onPress}
-              activeOpacity={item.onPress ? 0.75 : 1}
-              disabled={!item.onPress}
-            >
-              <View style={[styles.shareItemIcon, { backgroundColor: item.bg }]}>
-                <Feather name={item.icon} size={16} color={item.color} />
-              </View>
-              <View style={styles.shareItemText}>
-                <Text style={[styles.shareItemTitle, { color: colors.foreground }]}>
-                  {item.title}
-                </Text>
-                <Text style={[styles.shareItemDesc, { color: colors.mutedForeground }]}>
-                  {item.desc}
-                </Text>
-              </View>
-              <View style={[styles.shareItemBadge, { backgroundColor: item.bg }]}>
-                <Text style={[styles.shareItemBadgeText, { color: item.color }]}>
-                  {item.badge}
-                </Text>
-              </View>
-            </TouchableOpacity>
-          ))}
-        </View>
-
-        {/* Share button */}
-        <TouchableOpacity
-          style={[styles.shareBtn, { backgroundColor: KAKAO_YELLOW }]}
-          onPress={handleShare}
-          activeOpacity={0.85}
-        >
-          <View style={[styles.kakaoBtnIcon, { backgroundColor: "rgba(0,0,0,0.12)" }]}>
-            <Text style={[styles.kakaoBtnIconText, { color: KAKAO_DARK }]}>K</Text>
+          {/* Section label */}
+          <View style={styles.sectionLabelRow}>
+            <Text style={[styles.sectionLabel, { color: colors.mutedForeground }]}>
+              공유할 항목 선택
+            </Text>
+            <Text style={[styles.sectionCount, { color: colors.primary }]}>
+              {checkedCount}개 선택됨
+            </Text>
           </View>
-          <Text style={[styles.shareBtnText, { color: KAKAO_DARK }]}>카카오톡으로 공유하기</Text>
-        </TouchableOpacity>
 
-        <Text style={[styles.disclaimer, { color: colors.outlineVariant }]}>
-          공유 내용에는 영상 링크, 리포트, 상담 연결이 포함됩니다
-        </Text>
+          {/* Share items with checkboxes */}
+          <View style={styles.itemList}>
+            {ITEMS.map((item) => {
+              const isChecked = checked.has(item.key);
+
+              if (item.actionOnly) {
+                return (
+                  <TouchableOpacity
+                    key={item.key}
+                    style={[
+                      styles.shareItem,
+                      {
+                        backgroundColor: "#fffbeb",
+                        borderColor: "#f59e0b60",
+                      },
+                    ]}
+                    onPress={item.onAction}
+                    activeOpacity={0.75}
+                  >
+                    <View style={[styles.shareItemIcon, { backgroundColor: item.bg }]}>
+                      <Feather name={item.icon} size={16} color={item.color} />
+                    </View>
+                    <View style={styles.shareItemText}>
+                      <Text style={[styles.shareItemTitle, { color: colors.foreground }]}>
+                        {item.title}
+                      </Text>
+                      <Text style={[styles.shareItemDesc, { color: colors.mutedForeground }]}>
+                        {item.desc}
+                      </Text>
+                    </View>
+                    <View style={[styles.shareItemBadge, { backgroundColor: item.bg }]}>
+                      <Text style={[styles.shareItemBadgeText, { color: item.color }]}>
+                        {item.badge}
+                      </Text>
+                    </View>
+                  </TouchableOpacity>
+                );
+              }
+
+              return (
+                <TouchableOpacity
+                  key={item.key}
+                  style={[
+                    styles.shareItem,
+                    {
+                      backgroundColor: isChecked
+                        ? item.bg + "60"
+                        : colors.surfaceContainerLow,
+                      borderColor: isChecked
+                        ? item.color + "50"
+                        : colors.border + "40",
+                      borderWidth: isChecked ? 1.5 : 1,
+                    },
+                  ]}
+                  onPress={() => toggleCheck(item.key)}
+                  activeOpacity={0.75}
+                >
+                  {/* Checkbox */}
+                  <View
+                    style={[
+                      styles.checkbox,
+                      {
+                        backgroundColor: isChecked ? item.color : "transparent",
+                        borderColor: isChecked ? item.color : colors.border,
+                      },
+                    ]}
+                  >
+                    {isChecked && (
+                      <Feather name="check" size={12} color="#fff" />
+                    )}
+                  </View>
+
+                  <View style={[styles.shareItemIcon, { backgroundColor: item.bg }]}>
+                    <Feather name={item.icon} size={16} color={item.color} />
+                  </View>
+                  <View style={styles.shareItemText}>
+                    <Text style={[styles.shareItemTitle, { color: colors.foreground }]}>
+                      {item.title}
+                    </Text>
+                    <Text style={[styles.shareItemDesc, { color: colors.mutedForeground }]}>
+                      {item.desc}
+                    </Text>
+                  </View>
+                  <View style={[styles.shareItemBadge, { backgroundColor: isChecked ? item.bg : colors.surfaceContainerLow }]}>
+                    <Text style={[styles.shareItemBadgeText, { color: isChecked ? item.color : colors.mutedForeground }]}>
+                      {item.badge}
+                    </Text>
+                  </View>
+                </TouchableOpacity>
+              );
+            })}
+          </View>
+
+          <View style={{ height: 8 }} />
+        </ScrollView>
+
+        {/* ── Sticky bottom: share button ── */}
+        <View style={[styles.bottomBar, { borderTopColor: colors.border + "40", backgroundColor: colors.card }]}>
+          <TouchableOpacity
+            style={[
+              styles.shareBtn,
+              {
+                backgroundColor: checkedCount > 0 ? KAKAO_YELLOW : colors.surfaceContainerLow,
+                opacity: checkedCount > 0 ? 1 : 0.6,
+              },
+            ]}
+            onPress={handleShare}
+            activeOpacity={0.85}
+          >
+            <View style={[styles.kakaoBtnIcon, { backgroundColor: "rgba(0,0,0,0.10)" }]}>
+              <Text style={[styles.kakaoBtnIconText, { color: checkedCount > 0 ? KAKAO_DARK : colors.mutedForeground }]}>
+                K
+              </Text>
+            </View>
+            <Text style={[styles.shareBtnText, { color: checkedCount > 0 ? KAKAO_DARK : colors.mutedForeground }]}>
+              {checkedCount > 0 ? `${checkedCount}개 항목 공유하기` : "항목을 선택해 주세요"}
+            </Text>
+          </TouchableOpacity>
+          <Text style={[styles.disclaimer, { color: colors.outlineVariant }]}>
+            선택한 항목이 카카오톡 메시지에 포함됩니다
+          </Text>
+        </View>
       </View>
     </View>
   );
@@ -226,28 +355,26 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     right: 0,
-    borderTopLeftRadius: 28,
-    borderTopRightRadius: 28,
-    padding: 20,
-    paddingBottom: 36,
-    gap: 16,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: -4 },
-    shadowOpacity: 0.12,
-    shadowRadius: 16,
-    elevation: 20,
+    top: 80,
+    borderTopLeftRadius: 30,
+    borderTopRightRadius: 30,
+    overflow: "hidden",
   },
   handle: {
-    width: 40,
-    height: 4,
-    borderRadius: 2,
+    width: 42,
+    height: 5,
+    borderRadius: 3,
     alignSelf: "center",
-    marginBottom: 4,
+    marginTop: 12,
+    marginBottom: 2,
   },
   sheetHeader: {
     flexDirection: "row",
     alignItems: "center",
     gap: 12,
+    paddingHorizontal: 18,
+    paddingVertical: 14,
+    borderBottomWidth: 1,
   },
   kakaoIcon: {
     width: 40,
@@ -256,15 +383,15 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-  kakaoIconText: {
-    fontSize: 18,
-    fontWeight: "900",
-    color: "#3a1d1d",
-  },
+  kakaoIconText: { fontSize: 18, fontWeight: "900", color: "#3a1d1d" },
   headerText: { flex: 1 },
   headerTitle: { fontSize: 15, fontWeight: "700" },
   headerSub: { fontSize: 11, marginTop: 2 },
   closeBtn: { padding: 4 },
+
+  scrollArea: { flex: 1 },
+  scrollContent: { padding: 18, gap: 14 },
+
   previewCard: {
     borderRadius: 16,
     borderWidth: 1,
@@ -283,11 +410,7 @@ const styles = StyleSheet.create({
     transform: [{ rotate: "-90deg" }],
     letterSpacing: -0.5,
   },
-  previewBody: {
-    flex: 1,
-    padding: 14,
-    gap: 6,
-  },
+  previewBody: { flex: 1, padding: 14, gap: 6 },
   previewTitle: { fontSize: 13, fontWeight: "700" },
   previewDate: { fontSize: 11 },
   previewMetrics: {
@@ -300,14 +423,31 @@ const styles = StyleSheet.create({
   previewMetricVal: { fontSize: 16, fontWeight: "800" },
   previewMetricKey: { fontSize: 9, fontWeight: "600", textTransform: "uppercase" },
   previewDivider: { width: 1, height: 24 },
-  itemList: { gap: 8 },
+
+  sectionLabelRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  sectionLabel: { fontSize: 12, fontWeight: "600" },
+  sectionCount: { fontSize: 12, fontWeight: "800" },
+
+  itemList: { gap: 10 },
   shareItem: {
     flexDirection: "row",
     alignItems: "center",
     borderRadius: 14,
     borderWidth: 1,
     padding: 12,
-    gap: 12,
+    gap: 10,
+  },
+  checkbox: {
+    width: 22,
+    height: 22,
+    borderRadius: 7,
+    borderWidth: 1.5,
+    alignItems: "center",
+    justifyContent: "center",
   },
   shareItemIcon: {
     width: 36,
@@ -318,13 +458,20 @@ const styles = StyleSheet.create({
   },
   shareItemText: { flex: 1 },
   shareItemTitle: { fontSize: 13, fontWeight: "700" },
-  shareItemDesc: { fontSize: 11, marginTop: 2 },
+  shareItemDesc: { fontSize: 11, marginTop: 2, lineHeight: 15 },
   shareItemBadge: {
     borderRadius: 8,
     paddingHorizontal: 8,
     paddingVertical: 4,
   },
   shareItemBadgeText: { fontSize: 10, fontWeight: "700" },
+
+  bottomBar: {
+    borderTopWidth: 1,
+    padding: 16,
+    paddingBottom: 28,
+    gap: 10,
+  },
   shareBtn: {
     borderRadius: 16,
     paddingVertical: 16,
@@ -332,7 +479,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     gap: 10,
-    marginTop: 4,
   },
   kakaoBtnIcon: {
     width: 28,
@@ -341,17 +487,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-  kakaoBtnIconText: {
-    fontSize: 14,
-    fontWeight: "900",
-  },
-  shareBtnText: {
-    fontSize: 15,
-    fontWeight: "800",
-  },
-  disclaimer: {
-    fontSize: 10,
-    textAlign: "center",
-    marginTop: -8,
-  },
+  kakaoBtnIconText: { fontSize: 14, fontWeight: "900" },
+  shareBtnText: { fontSize: 15, fontWeight: "800" },
+  disclaimer: { fontSize: 10, textAlign: "center" },
 });
