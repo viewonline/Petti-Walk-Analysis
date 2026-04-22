@@ -1,7 +1,7 @@
 import { Feather } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
 import { useRouter } from "expo-router";
-import React from "react";
+import React, { useState } from "react";
 import {
   Platform,
   ScrollView,
@@ -13,10 +13,11 @@ import {
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { AnalysisCard } from "@/components/AnalysisCard";
+import { PrescriptionSummarySheet } from "@/components/PrescriptionSummarySheet";
 import { RomGauge } from "@/components/RomGauge";
 import { StatusBadge } from "@/components/StatusBadge";
 import { useColors } from "@/hooks/useColors";
-import { mockAnalyses } from "@/data/mockData";
+import { mockAnalyses, mockPrescription } from "@/data/mockData";
 import { usePet } from "@/context/PetContext";
 
 export default function HomeScreen() {
@@ -25,6 +26,9 @@ export default function HomeScreen() {
   const router = useRouter();
   const { petInfo } = usePet();
   const latest = mockAnalyses[0];
+  const rx = mockPrescription;
+
+  const [showRxSheet, setShowRxSheet] = useState(false);
 
   const topPad =
     Platform.OS === "web" ? Math.max(insets.top, 44) : insets.top;
@@ -37,126 +41,164 @@ export default function HomeScreen() {
   };
 
   return (
-    <ScrollView
-      style={[styles.root, { backgroundColor: colors.background }]}
-      contentContainerStyle={[
-        styles.content,
-        {
-          paddingTop: topPad + 12,
-          paddingBottom: insets.bottom + bottomPad + 100,
-        },
-      ]}
-      showsVerticalScrollIndicator={false}
-    >
-      {/* Header */}
-      <View style={styles.headerRow}>
-        <View style={[styles.logoCircle, { backgroundColor: colors.primaryFixed }]}>
-          <Feather name="activity" size={18} color={colors.primary} />
-        </View>
-        <Text style={[styles.appName, { color: colors.primary }]}>Petti</Text>
-        <TouchableOpacity
-          style={[styles.settingsBtn, { backgroundColor: colors.surfaceContainerLow }]}
-          onPress={() => router.push("/(tabs)/profile")}
-          activeOpacity={0.7}
-        >
-          <Feather name="settings" size={18} color={colors.primary} />
-        </TouchableOpacity>
-      </View>
-
-      {/* Pet Hero Card */}
-      <View style={[styles.heroCard, { backgroundColor: colors.surfaceContainerLow }]}>
-        <View>
-          <Text style={[styles.guardianLabel, { color: colors.secondary }]}>
-            활성 견주
-          </Text>
-          <Text style={[styles.petName, { color: colors.foreground }]}>
-            {petInfo.name}
-          </Text>
-          <Text style={[styles.petBreed, { color: colors.mutedForeground }]}>
-            {petInfo.age}살 {petInfo.breed}
-          </Text>
-        </View>
-        <View style={[styles.pawCircle, { backgroundColor: colors.primaryFixed }]}>
-          <Feather name="heart" size={28} color={colors.primary} />
-        </View>
-      </View>
-
-      {/* Analysis Summary + ROM */}
-      <View style={styles.summaryRow}>
-        <View
-          style={[
-            styles.summaryCard,
-            { backgroundColor: colors.card, flex: 1.4 },
-          ]}
-        >
-          <Text style={[styles.sectionLabel, { color: colors.mutedForeground }]}>
-            최근 분석
-          </Text>
-          <Text style={[styles.analysisDate, { color: colors.foreground }]}>
-            {latest.date}
-          </Text>
-          <View style={styles.badgeRow}>
-            <View style={[styles.romBadge, { backgroundColor: colors.tertiaryContainer }]}>
-              <Text style={[styles.romBadgeText, { color: "#fff" }]}>ROM 상태</Text>
-            </View>
-            <StatusBadge status={latest.status} size="md" />
-          </View>
-          <Text
-            style={[styles.analysisNote, { color: colors.mutedForeground }]}
-            numberOfLines={3}
-          >
-            {latest.note}
-          </Text>
-        </View>
-
-        <RomGauge value={latest.averageRom} />
-      </View>
-
-      {/* Record Button */}
-      <TouchableOpacity
-        style={[styles.recordBtn, { backgroundColor: colors.primary }]}
-        onPress={handleRecord}
-        activeOpacity={0.85}
+    <View style={[styles.root, { backgroundColor: colors.background }]}>
+      <ScrollView
+        style={{ flex: 1 }}
+        contentContainerStyle={[
+          styles.content,
+          {
+            paddingTop: topPad + 12,
+            paddingBottom: insets.bottom + bottomPad + 100,
+          },
+        ]}
+        showsVerticalScrollIndicator={false}
       >
-        <View style={styles.recordIconWrap}>
-          <Feather name="video" size={24} color={colors.primary} />
-        </View>
-        <View>
-          <Text style={[styles.recordTitle, { color: "#fff" }]}>
-            분석 영상 촬영
-          </Text>
-          <Text style={[styles.recordSub, { color: "rgba(255,255,255,0.75)" }]}>
-            자동 관절 동작 추적
-          </Text>
-        </View>
-      </TouchableOpacity>
-
-      {/* Recent Visits */}
-      <View style={styles.section}>
-        <View style={styles.sectionHeader}>
-          <Text style={[styles.sectionTitle, { color: colors.foreground }]}>
-            최근 방문
-          </Text>
-          <TouchableOpacity onPress={() => router.push("/(tabs)/history")}>
-            <Text style={[styles.viewAll, { color: colors.primary }]}>
-              전체 보기
-            </Text>
+        {/* Header */}
+        <View style={styles.headerRow}>
+          <View style={[styles.logoCircle, { backgroundColor: colors.primaryFixed }]}>
+            <Feather name="activity" size={18} color={colors.primary} />
+          </View>
+          <Text style={[styles.appName, { color: colors.primary }]}>Petti</Text>
+          <TouchableOpacity
+            style={[styles.settingsBtn, { backgroundColor: colors.surfaceContainerLow }]}
+            onPress={() => router.push("/(tabs)/profile")}
+            activeOpacity={0.7}
+          >
+            <Feather name="settings" size={18} color={colors.primary} />
           </TouchableOpacity>
         </View>
-        <View style={styles.visitList}>
-          {mockAnalyses.slice(0, 3).map((a) => (
-            <AnalysisCard
-              key={a.id}
-              analysis={a}
-              onPress={() => {
-                Haptics.selectionAsync();
-                router.push(`/(tabs)/history`);
-              }}
-            />
-          ))}
+
+        {/* ★ Prescription notification banner */}
+        <TouchableOpacity
+          style={[styles.rxBanner, { backgroundColor: colors.primaryFixed }]}
+          onPress={() => {
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+            setShowRxSheet(true);
+          }}
+          activeOpacity={0.88}
+        >
+          <View style={styles.rxBannerLeft}>
+            <View style={[styles.rxTag, { backgroundColor: colors.primary }]}>
+              <Text style={styles.rxTagText}>수의사 처방</Text>
+            </View>
+            <Text style={[styles.rxTitle, { color: colors.primary }]}>
+              {petInfo.name}의 맞춤 재활 솔루션이{"\n"}도착했습니다
+            </Text>
+            <Text style={[styles.rxSub, { color: colors.primary }]}>
+              {rx.date} · {rx.vetName}
+            </Text>
+          </View>
+          <View style={[styles.rxIconBox, { backgroundColor: colors.primary }]}>
+            <Feather name="package" size={24} color="#fff" />
+          </View>
+        </TouchableOpacity>
+
+        {/* Pet Hero Card */}
+        <View style={[styles.heroCard, { backgroundColor: colors.surfaceContainerLow }]}>
+          <View>
+            <Text style={[styles.guardianLabel, { color: colors.secondary }]}>
+              활성 견주
+            </Text>
+            <Text style={[styles.petName, { color: colors.foreground }]}>
+              {petInfo.name}
+            </Text>
+            <Text style={[styles.petBreed, { color: colors.mutedForeground }]}>
+              {petInfo.age}살 {petInfo.breed}
+            </Text>
+          </View>
+          <View style={[styles.pawCircle, { backgroundColor: colors.primaryFixed }]}>
+            <Feather name="heart" size={28} color={colors.primary} />
+          </View>
         </View>
-      </View>
-    </ScrollView>
+
+        {/* Analysis Summary + ROM */}
+        <View style={styles.summaryRow}>
+          <View
+            style={[
+              styles.summaryCard,
+              { backgroundColor: colors.card, flex: 1.4 },
+            ]}
+          >
+            <Text style={[styles.sectionLabel, { color: colors.mutedForeground }]}>
+              최근 분석
+            </Text>
+            <Text style={[styles.analysisDate, { color: colors.foreground }]}>
+              {latest.date}
+            </Text>
+            <View style={styles.badgeRow}>
+              <View style={[styles.romBadge, { backgroundColor: colors.tertiaryContainer }]}>
+                <Text style={[styles.romBadgeText, { color: "#fff" }]}>ROM 상태</Text>
+              </View>
+              <StatusBadge status={latest.status} size="md" />
+            </View>
+            <Text
+              style={[styles.analysisNote, { color: colors.mutedForeground }]}
+              numberOfLines={3}
+            >
+              {latest.note}
+            </Text>
+          </View>
+
+          <RomGauge value={latest.averageRom} />
+        </View>
+
+        {/* Record Button */}
+        <TouchableOpacity
+          style={[styles.recordBtn, { backgroundColor: colors.primary }]}
+          onPress={handleRecord}
+          activeOpacity={0.85}
+        >
+          <View style={styles.recordIconWrap}>
+            <Feather name="video" size={24} color={colors.primary} />
+          </View>
+          <View>
+            <Text style={[styles.recordTitle, { color: "#fff" }]}>
+              분석 영상 촬영
+            </Text>
+            <Text style={[styles.recordSub, { color: "rgba(255,255,255,0.75)" }]}>
+              자동 관절 동작 추적
+            </Text>
+          </View>
+        </TouchableOpacity>
+
+        {/* Recent Visits */}
+        <View style={styles.section}>
+          <View style={styles.sectionHeader}>
+            <Text style={[styles.sectionTitle, { color: colors.foreground }]}>
+              최근 방문
+            </Text>
+            <TouchableOpacity onPress={() => router.push("/(tabs)/history")}>
+              <Text style={[styles.viewAll, { color: colors.primary }]}>
+                전체 보기
+              </Text>
+            </TouchableOpacity>
+          </View>
+          <View style={styles.visitList}>
+            {mockAnalyses.slice(0, 3).map((a) => (
+              <AnalysisCard
+                key={a.id}
+                analysis={a}
+                onPress={() => {
+                  Haptics.selectionAsync();
+                  router.push(`/(tabs)/history`);
+                }}
+              />
+            ))}
+          </View>
+        </View>
+      </ScrollView>
+
+      {/* Prescription summary sheet (rendered outside ScrollView) */}
+      <PrescriptionSummarySheet
+        visible={showRxSheet}
+        onClose={() => setShowRxSheet(false)}
+        onViewDetail={() => {
+          setShowRxSheet(false);
+          router.push("/(tabs)/prescription");
+        }}
+        colors={colors}
+      />
+    </View>
   );
 }
 
@@ -189,6 +231,32 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
+
+  rxBanner: {
+    borderRadius: 20,
+    padding: 20,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 16,
+  },
+  rxBannerLeft: { flex: 1, gap: 6 },
+  rxTag: {
+    alignSelf: "flex-start",
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 20,
+  },
+  rxTagText: { fontSize: 10, fontWeight: "800", color: "#fff", letterSpacing: 0.5 },
+  rxTitle: { fontSize: 16, fontWeight: "800", lineHeight: 22, letterSpacing: -0.3 },
+  rxSub: { fontSize: 12, fontWeight: "500", opacity: 0.7 },
+  rxIconBox: {
+    width: 52,
+    height: 52,
+    borderRadius: 16,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+
   heroCard: {
     borderRadius: 20,
     padding: 24,
@@ -230,11 +298,6 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     padding: 18,
     gap: 8,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.04,
-    shadowRadius: 4,
-    elevation: 1,
   },
   sectionLabel: {
     fontSize: 11,
@@ -273,11 +336,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: 16,
-    shadowColor: "#00676a",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.25,
-    shadowRadius: 12,
-    elevation: 4,
   },
   recordIconWrap: {
     width: 48,
