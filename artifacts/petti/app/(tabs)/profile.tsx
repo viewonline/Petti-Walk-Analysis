@@ -17,12 +17,14 @@ import { mockAnalyses, OPTIMAL_ROM } from "@/data/mockData";
 import { usePet, PetInfo } from "@/context/PetContext";
 import { useAuth } from "@/context/AuthContext";
 
-const GENDER_OPTIONS = ["수컷", "수컷(중성화)", "암컷", "암컷(중성화)", "모름"];
+const GENDER_OPTIONS = ["수컷", "암컷"] as const;
+const NEUTERED_OPTIONS = ["했음", "안했음"] as const;
 
 const FIELDS = [
   { key: "name" as keyof PetInfo, icon: "tag", label: "이름", unit: "" },
   { key: "breed" as keyof PetInfo, icon: "activity", label: "견종", unit: "" },
   { key: "gender" as keyof PetInfo, icon: "users", label: "성별", unit: "" },
+  { key: "neutered" as keyof PetInfo, icon: "shield", label: "중성화 여부", unit: "" },
   { key: "age" as keyof PetInfo, icon: "calendar", label: "나이", unit: "살" },
   { key: "weight" as keyof PetInfo, icon: "trending-up", label: "체중", unit: "kg" },
   { key: "owner" as keyof PetInfo, icon: "user", label: "견주", unit: "" },
@@ -157,9 +159,10 @@ export default function ProfileScreen() {
         </View>
 
         {FIELDS.map((f, i) => {
-          const isGenderField = f.key === "gender";
+          const isToggleField = f.key === "gender" || f.key === "neutered";
+          const toggleOptions = f.key === "gender" ? GENDER_OPTIONS : NEUTERED_OPTIONS;
           const isLast = i === FIELDS.length - 1;
-          if (isGenderField && editing) {
+          if (isToggleField && editing) {
             return (
               <View
                 key={f.key}
@@ -176,12 +179,12 @@ export default function ProfileScreen() {
                   <Text style={[styles.infoLabel, { color: colors.mutedForeground }]}>{f.label}</Text>
                 </View>
                 <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 8, paddingBottom: 4 }}>
-                  {GENDER_OPTIONS.map((opt) => {
-                    const selected = draft.gender === opt;
+                  {toggleOptions.map((opt) => {
+                    const selected = draft[f.key] === opt;
                     return (
                       <TouchableOpacity
                         key={opt}
-                        onPress={() => setField("gender", opt)}
+                        onPress={() => setField(f.key, opt)}
                         style={[
                           styles.genderBtn,
                           {

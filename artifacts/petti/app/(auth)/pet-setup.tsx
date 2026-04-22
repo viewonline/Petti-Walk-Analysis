@@ -16,7 +16,8 @@ import { useColors } from "@/hooks/useColors";
 import { useAuth } from "@/context/AuthContext";
 import { usePet, PetInfo } from "@/context/PetContext";
 
-const GENDER_OPTIONS = ["수컷", "수컷(중성화)", "암컷", "암컷(중성화)", "모름"];
+const GENDER_OPTIONS = ["수컷", "암컷"] as const;
+const NEUTERED_OPTIONS = ["했음", "안했음"] as const;
 
 const TEXT_FIELDS: {
   key: keyof PetInfo;
@@ -47,6 +48,7 @@ export default function PetSetupScreen() {
     name: "",
     breed: "",
     gender: "수컷",
+    neutered: "안했음",
     age: "",
     weight: "",
     owner: "",
@@ -71,6 +73,7 @@ export default function PetSetupScreen() {
       name: form.name.trim() || "내 강아지",
       breed: form.breed.trim() || "미정",
       gender: form.gender,
+      neutered: form.neutered,
       age: form.age.trim() || "1",
       weight: form.weight.trim() || "0",
       owner: form.owner.trim() || "견주",
@@ -119,15 +122,16 @@ export default function PetSetupScreen() {
           </Text>
         </View>
 
-        {/* Gender Selection */}
+        {/* Gender + Neutered Selection */}
         <View style={[styles.card, { backgroundColor: colors.card }]}>
-          <View style={styles.fieldLabelRow}>
+          {/* 성별 */}
+          <View style={[styles.fieldLabelRow, { marginBottom: 10 }]}>
             <View style={[styles.fieldIcon, { backgroundColor: colors.primaryFixed }]}>
               <Feather name="users" size={14} color={colors.primary} />
             </View>
             <Text style={[styles.fieldLabel, { color: colors.mutedForeground }]}>성별</Text>
           </View>
-          <View style={styles.genderGrid}>
+          <View style={[styles.genderGrid, { marginBottom: 20 }]}>
             {GENDER_OPTIONS.map((g) => {
               const selected = form.gender === g;
               return (
@@ -146,13 +150,42 @@ export default function PetSetupScreen() {
                   }}
                   activeOpacity={0.7}
                 >
-                  <Text
-                    style={[
-                      styles.genderText,
-                      { color: selected ? "#fff" : colors.foreground },
-                    ]}
-                  >
+                  <Text style={[styles.genderText, { color: selected ? "#fff" : colors.foreground }]}>
                     {g}
+                  </Text>
+                </TouchableOpacity>
+              );
+            })}
+          </View>
+
+          {/* 중성화 여부 */}
+          <View style={[styles.fieldLabelRow, { marginBottom: 10 }]}>
+            <View style={[styles.fieldIcon, { backgroundColor: colors.primaryFixed }]}>
+              <Feather name="shield" size={14} color={colors.primary} />
+            </View>
+            <Text style={[styles.fieldLabel, { color: colors.mutedForeground }]}>중성화 여부</Text>
+          </View>
+          <View style={styles.genderGrid}>
+            {NEUTERED_OPTIONS.map((n) => {
+              const selected = form.neutered === n;
+              return (
+                <TouchableOpacity
+                  key={n}
+                  style={[
+                    styles.genderBtn,
+                    {
+                      backgroundColor: selected ? colors.primary : colors.surfaceContainerLow,
+                      borderColor: selected ? colors.primary : colors.border,
+                    },
+                  ]}
+                  onPress={() => {
+                    Haptics.selectionAsync();
+                    setField("neutered", n);
+                  }}
+                  activeOpacity={0.7}
+                >
+                  <Text style={[styles.genderText, { color: selected ? "#fff" : colors.foreground }]}>
+                    {n}
                   </Text>
                 </TouchableOpacity>
               );

@@ -3,7 +3,8 @@ import React, { createContext, useContext, useState } from "react";
 export interface PetInfo {
   name: string;
   breed: string;
-  gender: string;
+  gender: "수컷" | "암컷" | "";
+  neutered: "했음" | "안했음" | "";
   age: string;
   weight: string;
   owner: string;
@@ -14,6 +15,7 @@ const DEFAULT_PET: PetInfo = {
   name: "올리버",
   breed: "골든 리트리버",
   gender: "수컷",
+  neutered: "했음",
   age: "6",
   weight: "28.5",
   owner: "김민준",
