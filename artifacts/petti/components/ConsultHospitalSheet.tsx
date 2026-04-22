@@ -25,20 +25,36 @@ interface Props {
   colors: any;
 }
 
-function StarRow({ rating }: { rating: number }) {
+function StarRating({ rating }: { rating: number }) {
+  const full = Math.floor(rating);
+  const hasHalf = rating - full >= 0.5;
   return (
-    <View style={{ flexDirection: "row", alignItems: "center", gap: 1 }}>
+    <View style={{ flexDirection: "row", alignItems: "center", gap: 2 }}>
       {[1, 2, 3, 4, 5].map((i) => (
-        <Feather
+        <Text
           key={i}
-          name="star"
-          size={10}
-          color={i <= Math.round(rating) ? "#f59e0b" : "#d1d5db"}
-        />
+          style={{
+            fontSize: 13,
+            color: i <= full ? "#f59e0b" : hasHalf && i === full + 1 ? "#f59e0b" : "#d1d5db",
+            lineHeight: 16,
+          }}
+        >
+          {i <= full ? "★" : hasHalf && i === full + 1 ? "★" : "☆"}
+        </Text>
       ))}
     </View>
   );
 }
+
+const SPECIALTY_COLORS: Record<string, { bg: string; fg: string }> = {
+  정형외과: { bg: "#e0f2f1", fg: "#00676a" },
+  재활: { bg: "#e8f5e9", fg: "#2e7d32" },
+  피부과: { bg: "#fce4ec", fg: "#c2185b" },
+  건강검진: { bg: "#e3f2fd", fg: "#1565c0" },
+  중성화수술: { bg: "#f3e5f5", fg: "#6a1b9a" },
+  내과: { bg: "#fff3e0", fg: "#e65100" },
+  치과: { bg: "#e8eaf6", fg: "#283593" },
+};
 
 export function ConsultHospitalSheet({ visible, onClose, analysis, colors }: Props) {
   const [activeFilter, setActiveFilter] = useState<Specialty | "전체">("전체");
@@ -79,20 +95,17 @@ export function ConsultHospitalSheet({ visible, onClose, analysis, colors }: Pro
       <Pressable style={[StyleSheet.absoluteFill, styles.backdrop]} onPress={onClose} />
 
       <View style={[styles.sheet, { backgroundColor: colors.background }]}>
-        {/* Top handle */}
         <View style={[styles.handle, { backgroundColor: colors.border }]} />
 
         {/* Header */}
-        <View style={[styles.header, { borderBottomColor: colors.border + "40" }]}>
-          <TouchableOpacity style={styles.closeBtn} onPress={onClose}>
-            <Feather name="chevron-down" size={22} color={colors.foreground} />
+        <View style={[styles.header, { borderBottomColor: colors.border + "50" }]}>
+          <TouchableOpacity style={styles.closeBtn} onPress={onClose} hitSlop={8}>
+            <Feather name="chevron-down" size={24} color={colors.foreground} />
           </TouchableOpacity>
           <Text style={[styles.headerTitle, { color: colors.foreground }]}>맞춤 상담 병원</Text>
           <View style={styles.headerRight}>
-            <Text style={[styles.headerDistrict, { color: colors.primary }]}>
-              서울 양천구
-            </Text>
-            <Feather name="map-pin" size={13} color={colors.primary} />
+            <Feather name="map-pin" size={14} color={colors.primary} />
+            <Text style={[styles.headerDistrict, { color: colors.primary }]}>서울 양천구</Text>
           </View>
         </View>
 
@@ -100,29 +113,30 @@ export function ConsultHospitalSheet({ visible, onClose, analysis, colors }: Pro
           style={{ flex: 1 }}
           showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"
+          contentContainerStyle={{ paddingBottom: 48 }}
         >
-          {/* Analysis context card */}
+          {/* Analysis context banner */}
           {analysis && (
-            <View style={[styles.contextCard, { backgroundColor: colors.primaryFixed + "80", borderColor: colors.primary + "30" }]}>
-              <View style={[styles.contextIcon, { backgroundColor: colors.primary }]}>
-                <Feather name="activity" size={13} color="#fff" />
+            <View style={[styles.contextBanner, { backgroundColor: colors.primaryFixed + "90", borderColor: colors.primary + "40" }]}>
+              <View style={[styles.contextDot, { backgroundColor: colors.primary }]}>
+                <Feather name="activity" size={14} color="#fff" />
               </View>
-              <View style={styles.contextText}>
-                <Text style={[styles.contextTitle, { color: colors.primary }]}>
+              <View style={{ flex: 1 }}>
+                <Text style={[styles.contextTop, { color: colors.primary }]}>
                   {mockPet.name}의 최근 분석 기반 추천
                 </Text>
                 <Text style={[styles.contextSub, { color: colors.foreground }]}>
-                  평균 ROM {analysis.averageRom}° · BCS {analysis.bcs.toFixed(1)} ·{" "}
+                  ROM {analysis.averageRom}°&nbsp;·&nbsp;BCS {analysis.bcs.toFixed(1)}&nbsp;·&nbsp;
                   <Text style={{ color: statusColor, fontWeight: "700" }}>{statusLabel}</Text>
-                  {analysis.compensationPattern ? ` · ${analysis.compensationPattern}` : ""}
+                  {analysis.compensationPattern ? `\n${analysis.compensationPattern}` : ""}
                 </Text>
               </View>
             </View>
           )}
 
-          {/* Search bar */}
-          <View style={[styles.searchWrap, { backgroundColor: colors.surfaceContainerLow, borderColor: colors.border + "50" }]}>
-            <Feather name="search" size={15} color={colors.mutedForeground} />
+          {/* Search */}
+          <View style={[styles.searchRow, { backgroundColor: colors.card, borderColor: colors.border + "60" }]}>
+            <Feather name="search" size={16} color={colors.mutedForeground} />
             <TextInput
               style={[styles.searchInput, { color: colors.foreground }]}
               value={searchQuery}
@@ -132,13 +146,13 @@ export function ConsultHospitalSheet({ visible, onClose, analysis, colors }: Pro
               returnKeyType="search"
             />
             {searchQuery.length > 0 && (
-              <TouchableOpacity onPress={() => setSearchQuery("")}>
-                <Feather name="x" size={14} color={colors.mutedForeground} />
+              <TouchableOpacity onPress={() => setSearchQuery("")} hitSlop={8}>
+                <Feather name="x-circle" size={16} color={colors.mutedForeground} />
               </TouchableOpacity>
             )}
           </View>
 
-          {/* Filter chips */}
+          {/* Filters */}
           <ScrollView
             horizontal
             showsHorizontalScrollIndicator={false}
@@ -152,8 +166,8 @@ export function ConsultHospitalSheet({ visible, onClose, analysis, colors }: Pro
                   style={[
                     styles.filterChip,
                     {
-                      backgroundColor: active ? colors.primary : colors.surfaceContainerLow,
-                      borderColor: active ? colors.primary : colors.border + "60",
+                      backgroundColor: active ? colors.primary : colors.card,
+                      borderColor: active ? colors.primary : colors.border + "80",
                     },
                   ]}
                   onPress={() => {
@@ -170,17 +184,15 @@ export function ConsultHospitalSheet({ visible, onClose, analysis, colors }: Pro
             })}
           </ScrollView>
 
-          {/* Count */}
-          <View style={styles.countRow}>
-            <Text style={[styles.countText, { color: colors.mutedForeground }]}>
-              {filtered.length}개 병원
+          {/* Summary row */}
+          <View style={styles.summaryRow}>
+            <Text style={[styles.summaryCount, { color: colors.mutedForeground }]}>
+              <Text style={{ color: colors.primary, fontWeight: "800" }}>{filtered.length}</Text>개 병원
             </Text>
-            <Text style={[styles.sortText, { color: colors.primary }]}>
-              펫티랭킹 순 ▾
-            </Text>
+            <Text style={[styles.sortLabel, { color: colors.primary }]}>펫티랭킹 순 ▾</Text>
           </View>
 
-          {/* Hospital list */}
+          {/* Hospital cards */}
           <View style={styles.list}>
             {filtered.map((h) => {
               const isBookmarked = bookmarked.has(h.id);
@@ -192,119 +204,112 @@ export function ConsultHospitalSheet({ visible, onClose, analysis, colors }: Pro
                     styles.card,
                     {
                       backgroundColor: colors.card,
-                      borderColor: h.recommended ? colors.primary + "40" : colors.border + "30",
+                      borderColor: h.recommended ? colors.primary + "50" : colors.border + "40",
+                      borderWidth: h.recommended ? 1.5 : 1,
                     },
                   ]}
                 >
+                  {/* Recommended banner */}
                   {h.recommended && (
-                    <View style={[styles.recommendBadge, { backgroundColor: colors.primaryFixed }]}>
-                      <Feather name="award" size={10} color={colors.primary} />
-                      <Text style={[styles.recommendText, { color: colors.primary }]}>Petti 추천</Text>
+                    <View style={[styles.recBanner, { backgroundColor: colors.primaryFixed }]}>
+                      <Feather name="award" size={12} color={colors.primary} />
+                      <Text style={[styles.recText, { color: colors.primary }]}>Petti 추천 병원</Text>
                     </View>
                   )}
 
-                  <View style={styles.cardTop}>
-                    <View style={[styles.hospitalAvatar, { backgroundColor: colors.surfaceContainerLow }]}>
-                      <Feather name="plus-square" size={20} color={colors.primary} />
+                  <View style={styles.cardBody}>
+                    {/* Left avatar */}
+                    <View style={[styles.avatar, { backgroundColor: colors.surfaceContainerLow }]}>
+                      <Text style={styles.avatarEmoji}>🏥</Text>
                     </View>
-                    <View style={styles.cardInfo}>
-                      <View style={styles.cardNameRow}>
-                        <Text style={[styles.cardName, { color: colors.foreground }]}>
+
+                    {/* Center info */}
+                    <View style={{ flex: 1 }}>
+                      <View style={styles.nameRow}>
+                        <Text style={[styles.hospitalName, { color: colors.foreground }]}>
                           {h.name}
                         </Text>
                         {h.revisitRate >= 100 && (
-                          <View style={[styles.revisitBadge, { backgroundColor: "#e0f2f1" }]}>
-                            <Text style={styles.revisitText}>재방문 의사 {h.revisitRate}%</Text>
+                          <View style={[styles.revisitBadge, { backgroundColor: "#e0f7fa" }]}>
+                            <Text style={styles.revisitText}>재방문 {h.revisitRate}%</Text>
                           </View>
                         )}
                       </View>
 
                       <View style={styles.ratingRow}>
-                        <StarRow rating={h.rating} />
-                        <Text style={[styles.ratingNum, { color: "#f59e0b" }]}>
-                          {h.rating.toFixed(1)}
-                        </Text>
+                        <StarRating rating={h.rating} />
+                        <Text style={styles.ratingNum}>{h.rating.toFixed(1)}</Text>
                         {h.reviewCount > 0 && (
                           <Text style={[styles.reviewCount, { color: colors.mutedForeground }]}>
-                            ({h.reviewCount})
+                            ({h.reviewCount}건)
                           </Text>
                         )}
                       </View>
 
-                      <View style={styles.specialtyRow}>
-                        {h.specialties.slice(0, 3).map((s) => (
-                          <View
-                            key={s}
-                            style={[styles.specialtyTag, { backgroundColor: colors.surfaceContainerLow }]}
-                          >
-                            <Text style={[styles.specialtyText, { color: colors.mutedForeground }]}>
-                              {s}
-                            </Text>
-                          </View>
-                        ))}
+                      {/* Specialty tags */}
+                      <View style={styles.tagsRow}>
+                        {h.specialties.slice(0, 3).map((s) => {
+                          const c = SPECIALTY_COLORS[s] ?? { bg: colors.surfaceContainerLow, fg: colors.mutedForeground };
+                          return (
+                            <View key={s} style={[styles.tag, { backgroundColor: c.bg }]}>
+                              <Text style={[styles.tagText, { color: c.fg }]}>{s}</Text>
+                            </View>
+                          );
+                        })}
                       </View>
                     </View>
 
+                    {/* Bookmark */}
                     <TouchableOpacity
-                      style={styles.bookmarkBtn}
                       onPress={() => toggleBookmark(h.id)}
-                      activeOpacity={0.7}
+                      hitSlop={8}
+                      style={styles.bookmarkBtn}
                     >
-                      <Feather
-                        name={isBookmarked ? "heart" : "heart"}
-                        size={18}
-                        color={isBookmarked ? "#ef4444" : colors.border}
-                      />
+                      <Text style={{ fontSize: 20, color: isBookmarked ? "#ef4444" : colors.border }}>
+                        {isBookmarked ? "♥" : "♡"}
+                      </Text>
                     </TouchableOpacity>
                   </View>
 
-                  {/* Hours & distance */}
-                  <View style={[styles.metaRow, { borderTopColor: colors.border + "30" }]}>
+                  {/* Meta strip */}
+                  <View style={[styles.metaStrip, { borderTopColor: colors.border + "30", backgroundColor: colors.surfaceContainerLow + "80" }]}>
                     <View style={styles.metaItem}>
-                      <Feather name="clock" size={11} color={colors.mutedForeground} />
-                      <Text
-                        style={[
-                          styles.metaText,
-                          { color: h.isOpen ? colors.primary : colors.destructive },
-                        ]}
-                      >
+                      <Feather name="clock" size={12} color={h.isOpen ? colors.primary : "#ef4444"} />
+                      <Text style={[styles.metaText, { color: h.isOpen ? colors.primary : "#ef4444", fontWeight: "700" }]}>
                         {h.isOpen ? "진료중" : "진료종료"}
                       </Text>
                       <Text style={[styles.metaText, { color: colors.mutedForeground }]}>
                         {h.hours}
                       </Text>
                     </View>
+                    <Text style={[styles.metaDot, { color: colors.border }]}>·</Text>
                     <View style={styles.metaItem}>
-                      <Feather name="map-pin" size={11} color={colors.mutedForeground} />
-                      <Text style={[styles.metaText, { color: colors.mutedForeground }]}>
-                        {h.distance}
-                      </Text>
+                      <Feather name="map-pin" size={12} color={colors.mutedForeground} />
+                      <Text style={[styles.metaText, { color: colors.mutedForeground }]}>{h.distance}</Text>
                     </View>
+                    <Text style={[styles.metaDot, { color: colors.border }]}>·</Text>
                     <View style={styles.metaItem}>
-                      <Feather name="calendar" size={11} color={colors.mutedForeground} />
+                      <Feather name="credit-card" size={12} color={colors.mutedForeground} />
                       <Text style={[styles.metaText, { color: colors.mutedForeground }]}>
-                        최대 {h.maxFee.toLocaleString()}원
+                        최대 {(h.maxFee / 1000).toFixed(0)}천원
                       </Text>
                     </View>
                   </View>
 
-                  {/* Action row */}
+                  {/* Action buttons */}
                   <View style={styles.actionRow}>
                     <TouchableOpacity
-                      style={[styles.reportBtn, { borderColor: colors.primary + "60", backgroundColor: colors.surfaceContainerLow }]}
+                      style={[styles.reportBtn, { borderColor: colors.primary + "70" }]}
                       activeOpacity={0.75}
                     >
-                      <Feather name="file-text" size={13} color={colors.primary} />
-                      <Text style={[styles.reportBtnText, { color: colors.primary }]}>
-                        리포트 전송
-                      </Text>
+                      <Feather name="file-text" size={14} color={colors.primary} />
+                      <Text style={[styles.reportBtnText, { color: colors.primary }]}>리포트 전송</Text>
                     </TouchableOpacity>
-
                     <TouchableOpacity
                       style={[styles.bookBtn, { backgroundColor: colors.primary }]}
                       activeOpacity={0.85}
                     >
-                      <Feather name="calendar" size={13} color="#fff" />
+                      <Feather name="calendar" size={14} color="#fff" />
                       <Text style={styles.bookBtnText}>예약하기</Text>
                     </TouchableOpacity>
                   </View>
@@ -312,8 +317,6 @@ export function ConsultHospitalSheet({ visible, onClose, analysis, colors }: Pro
               );
             })}
           </View>
-
-          <View style={{ height: 40 }} />
         </ScrollView>
       </View>
     </View>
@@ -323,206 +326,193 @@ export function ConsultHospitalSheet({ visible, onClose, analysis, colors }: Pro
 const styles = StyleSheet.create({
   backdrop: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: "rgba(0,0,0,0.45)",
+    backgroundColor: "rgba(0,0,0,0.50)",
   },
   sheet: {
     position: "absolute",
     bottom: 0,
     left: 0,
     right: 0,
-    top: "8%",
-    borderTopLeftRadius: 28,
-    borderTopRightRadius: 28,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: -4 },
-    shadowOpacity: 0.14,
-    shadowRadius: 20,
-    elevation: 30,
+    top: 64,
+    borderTopLeftRadius: 32,
+    borderTopRightRadius: 32,
     overflow: "hidden",
   },
   handle: {
-    width: 40,
-    height: 4,
-    borderRadius: 2,
+    width: 44,
+    height: 5,
+    borderRadius: 3,
     alignSelf: "center",
-    marginTop: 10,
-    marginBottom: 4,
+    marginTop: 12,
+    marginBottom: 6,
   },
   header: {
     flexDirection: "row",
     alignItems: "center",
-    paddingHorizontal: 16,
-    paddingVertical: 12,
+    paddingHorizontal: 18,
+    paddingVertical: 14,
     borderBottomWidth: 1,
+    gap: 10,
   },
-  closeBtn: { padding: 4, marginRight: 4 },
-  headerTitle: { flex: 1, fontSize: 17, fontWeight: "800", letterSpacing: -0.3 },
+  closeBtn: { padding: 2 },
+  headerTitle: {
+    flex: 1,
+    fontSize: 18,
+    fontWeight: "800",
+    letterSpacing: -0.4,
+  },
   headerRight: { flexDirection: "row", alignItems: "center", gap: 4 },
-  headerDistrict: { fontSize: 13, fontWeight: "600" },
-  contextCard: {
+  headerDistrict: { fontSize: 13, fontWeight: "700" },
+  contextBanner: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    gap: 12,
+    marginHorizontal: 16,
+    marginTop: 16,
+    marginBottom: 6,
+    borderRadius: 14,
+    borderWidth: 1,
+    padding: 14,
+  },
+  contextDot: {
+    width: 32,
+    height: 32,
+    borderRadius: 10,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  contextTop: { fontSize: 12, fontWeight: "700", marginBottom: 3 },
+  contextSub: { fontSize: 13, fontWeight: "500", lineHeight: 18 },
+  searchRow: {
     flexDirection: "row",
     alignItems: "center",
     gap: 10,
     marginHorizontal: 16,
     marginTop: 14,
-    marginBottom: 4,
+    marginBottom: 2,
     borderRadius: 14,
     borderWidth: 1,
-    padding: 12,
+    paddingHorizontal: 14,
+    paddingVertical: 11,
   },
-  contextIcon: {
-    width: 28,
-    height: 28,
-    borderRadius: 8,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  contextText: { flex: 1 },
-  contextTitle: { fontSize: 11, fontWeight: "700", marginBottom: 2 },
-  contextSub: { fontSize: 12, fontWeight: "500" },
-  searchWrap: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 8,
-    marginHorizontal: 16,
-    marginTop: 12,
-    borderRadius: 12,
-    borderWidth: 1,
-    paddingHorizontal: 12,
-    paddingVertical: 9,
-  },
-  searchInput: { flex: 1, fontSize: 14, fontWeight: "500" },
+  searchInput: { flex: 1, fontSize: 15, fontWeight: "500" },
   filterRow: {
     paddingHorizontal: 16,
-    paddingVertical: 12,
+    paddingVertical: 14,
     gap: 8,
     flexDirection: "row",
   },
   filterChip: {
     borderRadius: 999,
     borderWidth: 1,
-    paddingHorizontal: 14,
-    paddingVertical: 6,
+    paddingHorizontal: 16,
+    paddingVertical: 7,
   },
-  filterChipText: { fontSize: 12, fontWeight: "600" },
-  countRow: {
+  filterChipText: { fontSize: 13, fontWeight: "600" },
+  summaryRow: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    paddingHorizontal: 16,
-    marginBottom: 10,
+    paddingHorizontal: 18,
+    marginBottom: 12,
   },
-  countText: { fontSize: 12, fontWeight: "500" },
-  sortText: { fontSize: 12, fontWeight: "600" },
-  list: {
-    paddingHorizontal: 16,
-    gap: 12,
-  },
+  summaryCount: { fontSize: 13, fontWeight: "500" },
+  sortLabel: { fontSize: 13, fontWeight: "700" },
+  list: { paddingHorizontal: 16, gap: 14 },
   card: {
-    borderRadius: 18,
-    borderWidth: 1,
+    borderRadius: 20,
     overflow: "hidden",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 4,
-    elevation: 2,
   },
-  recommendBadge: {
+  recBanner: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 4,
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderBottomWidth: 1,
-    borderBottomColor: "rgba(0,103,106,0.15)",
+    gap: 5,
+    paddingHorizontal: 14,
+    paddingVertical: 8,
   },
-  recommendText: {
-    fontSize: 11,
-    fontWeight: "700",
-  },
-  cardTop: {
+  recText: { fontSize: 12, fontWeight: "800" },
+  cardBody: {
     flexDirection: "row",
     padding: 14,
     gap: 12,
     alignItems: "flex-start",
   },
-  hospitalAvatar: {
-    width: 48,
-    height: 48,
-    borderRadius: 14,
+  avatar: {
+    width: 52,
+    height: 52,
+    borderRadius: 15,
     alignItems: "center",
     justifyContent: "center",
   },
-  cardInfo: { flex: 1 },
-  cardNameRow: {
+  avatarEmoji: { fontSize: 26 },
+  nameRow: {
     flexDirection: "row",
     alignItems: "center",
     flexWrap: "wrap",
     gap: 6,
-    marginBottom: 4,
+    marginBottom: 5,
   },
-  cardName: { fontSize: 15, fontWeight: "800" },
+  hospitalName: { fontSize: 16, fontWeight: "800", letterSpacing: -0.3 },
   revisitBadge: {
-    borderRadius: 6,
-    paddingHorizontal: 6,
-    paddingVertical: 2,
-  },
-  revisitText: { fontSize: 9, fontWeight: "700", color: "#00676a" },
-  ratingRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 4,
-    marginBottom: 6,
-  },
-  ratingNum: { fontSize: 12, fontWeight: "800" },
-  reviewCount: { fontSize: 11 },
-  specialtyRow: { flexDirection: "row", flexWrap: "wrap", gap: 4 },
-  specialtyTag: {
     borderRadius: 6,
     paddingHorizontal: 7,
     paddingVertical: 3,
   },
-  specialtyText: { fontSize: 10, fontWeight: "600" },
-  bookmarkBtn: { padding: 4 },
-  metaRow: {
+  revisitText: { fontSize: 10, fontWeight: "800", color: "#00676a" },
+  ratingRow: {
     flexDirection: "row",
+    alignItems: "center",
+    gap: 5,
+    marginBottom: 7,
+  },
+  ratingNum: { fontSize: 13, fontWeight: "800", color: "#f59e0b" },
+  reviewCount: { fontSize: 12 },
+  tagsRow: { flexDirection: "row", flexWrap: "wrap", gap: 5 },
+  tag: {
+    borderRadius: 8,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+  },
+  tagText: { fontSize: 11, fontWeight: "700" },
+  bookmarkBtn: { padding: 4 },
+  metaStrip: {
+    flexDirection: "row",
+    alignItems: "center",
     flexWrap: "wrap",
-    gap: 12,
+    gap: 6,
     paddingHorizontal: 14,
     paddingVertical: 10,
     borderTopWidth: 1,
   },
   metaItem: { flexDirection: "row", alignItems: "center", gap: 4 },
-  metaText: { fontSize: 11, fontWeight: "500" },
+  metaText: { fontSize: 12, fontWeight: "500" },
+  metaDot: { fontSize: 12 },
   actionRow: {
     flexDirection: "row",
-    gap: 8,
+    gap: 10,
     paddingHorizontal: 14,
     paddingBottom: 14,
-    paddingTop: 4,
+    paddingTop: 8,
   },
   reportBtn: {
     flex: 1,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    gap: 6,
-    borderWidth: 1,
-    borderRadius: 10,
-    paddingHorizontal: 12,
-    paddingVertical: 10,
+    gap: 7,
+    borderWidth: 1.5,
+    borderRadius: 12,
+    paddingVertical: 12,
   },
-  reportBtnText: { fontSize: 13, fontWeight: "700" },
+  reportBtnText: { fontSize: 14, fontWeight: "700" },
   bookBtn: {
     flex: 1,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    gap: 6,
-    borderRadius: 10,
-    paddingHorizontal: 12,
-    paddingVertical: 10,
+    gap: 7,
+    borderRadius: 12,
+    paddingVertical: 12,
   },
-  bookBtnText: { fontSize: 13, fontWeight: "700", color: "#fff" },
+  bookBtnText: { fontSize: 14, fontWeight: "700", color: "#fff" },
 });
