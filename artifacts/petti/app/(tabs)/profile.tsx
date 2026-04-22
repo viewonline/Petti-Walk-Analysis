@@ -237,14 +237,20 @@ export default function ProfileScreen() {
                 onPress={() => {
                   Haptics.selectionAsync();
                   if (s.label === "로그아웃") {
-                    Alert.alert("로그아웃", "정말 로그아웃하시겠습니까?", [
-                      { text: "취소", style: "cancel" },
-                      {
-                        text: "로그아웃",
-                        style: "destructive",
-                        onPress: logout,
-                      },
-                    ]);
+                    if (Platform.OS === "web") {
+                      if (window.confirm("정말 로그아웃하시겠습니까?")) {
+                        logout();
+                      }
+                    } else {
+                      Alert.alert("로그아웃", "정말 로그아웃하시겠습니까?", [
+                        { text: "취소", style: "cancel" },
+                        {
+                          text: "로그아웃",
+                          style: "destructive",
+                          onPress: logout,
+                        },
+                      ]);
+                    }
                   }
                 }}
                 activeOpacity={0.7}
