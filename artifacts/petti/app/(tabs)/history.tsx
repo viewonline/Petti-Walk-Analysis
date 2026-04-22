@@ -19,6 +19,7 @@ import { useColors } from "@/hooks/useColors";
 import { AnalysisCard } from "@/components/AnalysisCard";
 import { TrendChart } from "@/components/TrendChart";
 import { PettiTalk } from "@/components/PettiTalk";
+import { KakaoShareSheet } from "@/components/KakaoShareSheet";
 import { mockAnalyses, mockTrend, Analysis, mockPet } from "@/data/mockData";
 
 const HOSPITAL_URL = "https://pf.kakao.com/petti";
@@ -152,6 +153,13 @@ export default function HistoryScreen() {
   const insets = useSafeAreaInsets();
   const [selected, setSelected] = useState<Analysis | null>(null);
   const [pdfLoading, setPdfLoading] = useState(false);
+  const [shareTarget, setShareTarget] = useState<Analysis | null>(null);
+
+  const openKakaoShare = (a: Analysis) => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    setShareTarget(a);
+  };
+  const closeKakaoShare = () => setShareTarget(null);
 
   const topPad = Platform.OS === "web" ? Math.max(insets.top, 44) : insets.top;
   const bottomPad = Platform.OS === "web" ? 34 : 0;
@@ -226,6 +234,14 @@ export default function HistoryScreen() {
 
           {/* Action buttons */}
           <View style={styles.headerActions}>
+            <TouchableOpacity
+              style={[styles.actionBtn, { backgroundColor: "#FAE100" }]}
+              onPress={() => openKakaoShare(mockAnalyses[0])}
+              activeOpacity={0.8}
+            >
+              <Text style={styles.kakaoHeaderBtnText}>K</Text>
+            </TouchableOpacity>
+
             <TouchableOpacity
               style={[styles.actionBtn, { backgroundColor: colors.surfaceContainerLow }]}
               onPress={handleSavePdf}
@@ -314,6 +330,19 @@ export default function HistoryScreen() {
                       </View>
                     ))}
                   </View>
+
+                  {/* KakaoTalk share button */}
+                  <TouchableOpacity
+                    style={[styles.kakaoShareBtn]}
+                    onPress={() => openKakaoShare(a)}
+                    activeOpacity={0.85}
+                  >
+                    <View style={styles.kakaoBtnIconInline}>
+                      <Text style={styles.kakaoBtnIconInlineText}>K</Text>
+                    </View>
+                    <Text style={styles.kakaoShareBtnText}>카카오톡으로 공유하기</Text>
+                    <Feather name="chevron-right" size={14} color="#3a1d1d" />
+                  </TouchableOpacity>
                 </View>
               )}
             </View>
@@ -322,6 +351,13 @@ export default function HistoryScreen() {
       </ScrollView>
 
       <PettiTalk latestAnalysis={mockAnalyses[0]} />
+
+      <KakaoShareSheet
+        visible={shareTarget !== null}
+        onClose={closeKakaoShare}
+        analysis={shareTarget}
+        colors={colors}
+      />
     </View>
   );
 }
@@ -424,5 +460,38 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: "800",
     letterSpacing: -0.5,
+  },
+  kakaoHeaderBtnText: {
+    fontSize: 16,
+    fontWeight: "900",
+    color: "#3a1d1d",
+  },
+  kakaoShareBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+    backgroundColor: "#FAE100",
+    borderRadius: 14,
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+  },
+  kakaoBtnIconInline: {
+    width: 24,
+    height: 24,
+    borderRadius: 7,
+    backgroundColor: "rgba(0,0,0,0.12)",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  kakaoBtnIconInlineText: {
+    fontSize: 12,
+    fontWeight: "900",
+    color: "#3a1d1d",
+  },
+  kakaoShareBtnText: {
+    flex: 1,
+    fontSize: 13,
+    fontWeight: "700",
+    color: "#3a1d1d",
   },
 });
