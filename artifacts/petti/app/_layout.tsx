@@ -6,7 +6,7 @@ import {
   useFonts,
 } from "@expo-google-fonts/inter";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { Stack } from "expo-router";
+import { Stack, useRouter, useSegments } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import React, { useEffect } from "react";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
@@ -14,17 +14,39 @@ import { KeyboardProvider } from "react-native-keyboard-controller";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 
 import { ErrorBoundary } from "@/components/ErrorBoundary";
+import { AuthProvider, useAuth } from "@/context/AuthContext";
 import { PetProvider } from "@/context/PetContext";
 
 SplashScreen.preventAutoHideAsync();
 
 const queryClient = new QueryClient();
 
+function AuthGate() {
+  const { isLoggedIn } = useAuth();
+  const segments = useSegments();
+  const router = useRouter();
+
+  useEffect(() => {
+    const inAuthGroup = segments[0] === "(auth)";
+    if (!isLoggedIn && !inAuthGroup) {
+      router.replace("/(auth)");
+    } else if (isLoggedIn && inAuthGroup) {
+      router.replace("/(tabs)");
+    }
+  }, [isLoggedIn, segments]);
+
+  return null;
+}
+
 function RootLayoutNav() {
   return (
-    <Stack screenOptions={{ headerShown: false }}>
-      <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-    </Stack>
+    <>
+      <AuthGate />
+      <Stack screenOptions={{ headerShown: false, animation: "fade" }}>
+        <Stack.Screen name="(tabs)" />
+        <Stack.Screen name="(auth)" />
+      </Stack>
+    </>
   );
 }
 
@@ -47,15 +69,17 @@ export default function RootLayout() {
   return (
     <SafeAreaProvider>
       <ErrorBoundary>
-        <PetProvider>
-          <QueryClientProvider client={queryClient}>
-            <GestureHandlerRootView>
-              <KeyboardProvider>
-                <RootLayoutNav />
-              </KeyboardProvider>
-            </GestureHandlerRootView>
-          </QueryClientProvider>
-        </PetProvider>
+        <AuthProvider>
+          <PetProvider>
+            <QueryClientProvider client={queryClient}>
+              <GestureHandlerRootView>
+                <KeyboardProvider>
+                  <RootLayoutNav />
+                </KeyboardProvider>
+              </GestureHandlerRootView>
+            </QueryClientProvider>
+          </PetProvider>
+        </AuthProvider>
       </ErrorBoundary>
     </SafeAreaProvider>
   );

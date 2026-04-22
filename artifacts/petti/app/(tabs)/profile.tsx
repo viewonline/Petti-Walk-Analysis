@@ -15,6 +15,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useColors } from "@/hooks/useColors";
 import { mockAnalyses, OPTIMAL_ROM } from "@/data/mockData";
 import { usePet, PetInfo } from "@/context/PetContext";
+import { useAuth } from "@/context/AuthContext";
 
 const FIELDS = [
   { key: "name" as keyof PetInfo, icon: "tag", label: "이름", unit: "" },
@@ -40,6 +41,7 @@ export default function ProfileScreen() {
   const bottomPad = Platform.OS === "web" ? 34 : 0;
 
   const { petInfo, setPetInfo } = usePet();
+  const { logout } = useAuth();
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState<PetInfo>(petInfo);
 
@@ -237,7 +239,11 @@ export default function ProfileScreen() {
                   if (s.label === "로그아웃") {
                     Alert.alert("로그아웃", "정말 로그아웃하시겠습니까?", [
                       { text: "취소", style: "cancel" },
-                      { text: "로그아웃", style: "destructive" },
+                      {
+                        text: "로그아웃",
+                        style: "destructive",
+                        onPress: logout,
+                      },
                     ]);
                   }
                 }}
