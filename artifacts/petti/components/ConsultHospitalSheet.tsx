@@ -77,8 +77,8 @@ export function ConsultHospitalSheet({ visible, onClose, analysis, colors }: Pro
     analysis?.status === "good" ? "양호" : analysis?.status === "attention" ? "주의" : "위험";
 
   return (
-    <View style={StyleSheet.absoluteFill} pointerEvents="box-none">
-      <Pressable style={styles.backdrop} onPress={onClose} />
+    <View style={[StyleSheet.absoluteFill, { zIndex: 60 }]}>
+      <Pressable style={[StyleSheet.absoluteFill, styles.backdrop]} onPress={onClose} />
 
       <View style={[styles.sheet, { backgroundColor: colors.background }]}>
         {/* Top handle */}

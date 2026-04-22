@@ -94,13 +94,13 @@ export function KakaoShareSheet({ visible, onClose, onOpenConsult, analysis, col
       title: "맞춤 상담 병원 찾기",
       desc: "리뷰·거리·진료과목별 병원 선택 후 카카오톡 문의",
       badge: "병원 보기 →",
-      onPress: () => { onClose(); setTimeout(onOpenConsult, 100); },
+      onPress: onOpenConsult,
     },
   ];
 
   return (
-    <View style={StyleSheet.absoluteFill} pointerEvents="box-none">
-      <Pressable style={styles.backdrop} onPress={onClose} />
+    <View style={[StyleSheet.absoluteFill, { zIndex: 50 }]}>
+      <Pressable style={[StyleSheet.absoluteFill, styles.backdrop]} onPress={onClose} />
 
       <View style={[styles.sheet, { backgroundColor: colors.card }]}>
         <View style={[styles.handle, { backgroundColor: colors.border }]} />

@@ -163,7 +163,10 @@ export default function HistoryScreen() {
     setShareTarget(a);
   };
   const closeKakaoShare = () => setShareTarget(null);
-  const openConsult = () => setShowConsult(true);
+  const openConsult = () => {
+    setShareTarget(null);
+    setShowConsult(true);
+  };
   const closeConsult = () => setShowConsult(false);
 
   const topPad = Platform.OS === "web" ? Math.max(insets.top, 44) : insets.top;
