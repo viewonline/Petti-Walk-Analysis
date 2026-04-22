@@ -16,12 +16,14 @@ import { AnalysisCard } from "@/components/AnalysisCard";
 import { RomGauge } from "@/components/RomGauge";
 import { StatusBadge } from "@/components/StatusBadge";
 import { useColors } from "@/hooks/useColors";
-import { mockAnalyses, mockPet } from "@/data/mockData";
+import { mockAnalyses } from "@/data/mockData";
+import { usePet } from "@/context/PetContext";
 
 export default function HomeScreen() {
   const colors = useColors();
   const insets = useSafeAreaInsets();
   const router = useRouter();
+  const { petInfo } = usePet();
   const latest = mockAnalyses[0];
 
   const topPad =
@@ -68,10 +70,10 @@ export default function HomeScreen() {
             활성 견주
           </Text>
           <Text style={[styles.petName, { color: colors.foreground }]}>
-            {mockPet.name}
+            {petInfo.name}
           </Text>
           <Text style={[styles.petBreed, { color: colors.mutedForeground }]}>
-            {mockPet.age}살 {mockPet.breed}
+            {petInfo.age}살 {petInfo.breed}
           </Text>
         </View>
         <View style={[styles.pawCircle, { backgroundColor: colors.primaryFixed }]}>

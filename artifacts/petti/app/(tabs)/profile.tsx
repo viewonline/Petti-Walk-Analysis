@@ -14,24 +14,7 @@ import {
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useColors } from "@/hooks/useColors";
 import { mockAnalyses, OPTIMAL_ROM } from "@/data/mockData";
-
-interface PetInfo {
-  name: string;
-  breed: string;
-  age: string;
-  weight: string;
-  owner: string;
-  hospital: string;
-}
-
-const DEFAULT_INFO: PetInfo = {
-  name: "올리버",
-  breed: "골든 리트리버",
-  age: "6",
-  weight: "28.5",
-  owner: "김민준",
-  hospital: "행복 동물병원",
-};
+import { usePet, PetInfo } from "@/context/PetContext";
 
 const FIELDS = [
   { key: "name" as keyof PetInfo, icon: "tag", label: "이름", unit: "" },
@@ -56,9 +39,9 @@ export default function ProfileScreen() {
   const topPad = Platform.OS === "web" ? Math.max(insets.top, 44) : insets.top;
   const bottomPad = Platform.OS === "web" ? 34 : 0;
 
-  const [petInfo, setPetInfo] = useState<PetInfo>(DEFAULT_INFO);
+  const { petInfo, setPetInfo } = usePet();
   const [editing, setEditing] = useState(false);
-  const [draft, setDraft] = useState<PetInfo>(DEFAULT_INFO);
+  const [draft, setDraft] = useState<PetInfo>(petInfo);
 
   const latestRom = mockAnalyses[0].averageRom;
   const isGood = latestRom >= OPTIMAL_ROM.min && latestRom <= OPTIMAL_ROM.max;
