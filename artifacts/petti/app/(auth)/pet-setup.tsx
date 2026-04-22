@@ -122,79 +122,75 @@ export default function PetSetupScreen() {
           </Text>
         </View>
 
-        {/* Gender + Neutered Selection */}
+        {/* All Fields Card */}
         <View style={[styles.card, { backgroundColor: colors.card }]}>
           {/* 성별 */}
-          <View style={[styles.fieldLabelRow, { marginBottom: 10 }]}>
+          <View style={[styles.fieldRow, { borderBottomWidth: 1, borderBottomColor: colors.border + "30" }]}>
             <View style={[styles.fieldIcon, { backgroundColor: colors.primaryFixed }]}>
               <Feather name="users" size={14} color={colors.primary} />
             </View>
-            <Text style={[styles.fieldLabel, { color: colors.mutedForeground }]}>성별</Text>
-          </View>
-          <View style={[styles.genderGrid, { marginBottom: 20 }]}>
-            {GENDER_OPTIONS.map((g) => {
-              const selected = form.gender === g;
-              return (
-                <TouchableOpacity
-                  key={g}
-                  style={[
-                    styles.genderBtn,
-                    {
-                      backgroundColor: selected ? colors.primary : colors.surfaceContainerLow,
-                      borderColor: selected ? colors.primary : colors.border,
-                    },
-                  ]}
-                  onPress={() => {
-                    Haptics.selectionAsync();
-                    setField("gender", g);
-                  }}
-                  activeOpacity={0.7}
-                >
-                  <Text style={[styles.genderText, { color: selected ? "#fff" : colors.foreground }]}>
-                    {g}
-                  </Text>
-                </TouchableOpacity>
-              );
-            })}
+            <View style={styles.fieldContent}>
+              <Text style={[styles.fieldLabel, { color: colors.mutedForeground }]}>성별</Text>
+              <View style={styles.genderGrid}>
+                {GENDER_OPTIONS.map((g) => {
+                  const selected = form.gender === g;
+                  return (
+                    <TouchableOpacity
+                      key={g}
+                      style={[
+                        styles.genderBtn,
+                        {
+                          backgroundColor: selected ? colors.primary : colors.surfaceContainerLow,
+                          borderColor: selected ? colors.primary : colors.border,
+                        },
+                      ]}
+                      onPress={() => { Haptics.selectionAsync(); setField("gender", g); }}
+                      activeOpacity={0.7}
+                    >
+                      <Text style={[styles.genderText, { color: selected ? "#fff" : colors.foreground }]}>
+                        {g}
+                      </Text>
+                    </TouchableOpacity>
+                  );
+                })}
+              </View>
+            </View>
           </View>
 
           {/* 중성화 여부 */}
-          <View style={[styles.fieldLabelRow, { marginBottom: 10 }]}>
+          <View style={[styles.fieldRow, { borderBottomWidth: 1, borderBottomColor: colors.border + "30" }]}>
             <View style={[styles.fieldIcon, { backgroundColor: colors.primaryFixed }]}>
               <Feather name="shield" size={14} color={colors.primary} />
             </View>
-            <Text style={[styles.fieldLabel, { color: colors.mutedForeground }]}>중성화 여부</Text>
+            <View style={styles.fieldContent}>
+              <Text style={[styles.fieldLabel, { color: colors.mutedForeground }]}>중성화 여부</Text>
+              <View style={styles.genderGrid}>
+                {NEUTERED_OPTIONS.map((n) => {
+                  const selected = form.neutered === n;
+                  return (
+                    <TouchableOpacity
+                      key={n}
+                      style={[
+                        styles.genderBtn,
+                        {
+                          backgroundColor: selected ? colors.primary : colors.surfaceContainerLow,
+                          borderColor: selected ? colors.primary : colors.border,
+                        },
+                      ]}
+                      onPress={() => { Haptics.selectionAsync(); setField("neutered", n); }}
+                      activeOpacity={0.7}
+                    >
+                      <Text style={[styles.genderText, { color: selected ? "#fff" : colors.foreground }]}>
+                        {n}
+                      </Text>
+                    </TouchableOpacity>
+                  );
+                })}
+              </View>
+            </View>
           </View>
-          <View style={styles.genderGrid}>
-            {NEUTERED_OPTIONS.map((n) => {
-              const selected = form.neutered === n;
-              return (
-                <TouchableOpacity
-                  key={n}
-                  style={[
-                    styles.genderBtn,
-                    {
-                      backgroundColor: selected ? colors.primary : colors.surfaceContainerLow,
-                      borderColor: selected ? colors.primary : colors.border,
-                    },
-                  ]}
-                  onPress={() => {
-                    Haptics.selectionAsync();
-                    setField("neutered", n);
-                  }}
-                  activeOpacity={0.7}
-                >
-                  <Text style={[styles.genderText, { color: selected ? "#fff" : colors.foreground }]}>
-                    {n}
-                  </Text>
-                </TouchableOpacity>
-              );
-            })}
-          </View>
-        </View>
 
-        {/* Text Fields */}
-        <View style={[styles.card, { backgroundColor: colors.card }]}>
+          {/* Text Fields */}
           {TEXT_FIELDS.map((f, i) => (
             <View
               key={f.key}
