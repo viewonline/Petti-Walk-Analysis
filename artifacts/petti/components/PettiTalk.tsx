@@ -30,6 +30,7 @@ interface Message {
 
 interface PettiTalkProps {
   latestAnalysis: Analysis;
+  hidden?: boolean;
 }
 
 function buildContextMessage(a: Analysis): string {
@@ -39,7 +40,7 @@ function buildContextMessage(a: Analysis): string {
 let msgCounter = 0;
 const uid = () => `msg-${++msgCounter}-${Date.now()}`;
 
-export function PettiTalk({ latestAnalysis }: PettiTalkProps) {
+export function PettiTalk({ latestAnalysis, hidden = false }: PettiTalkProps) {
   const colors = useColors();
   const insets = useSafeAreaInsets();
   const [open, setOpen] = useState(false);
@@ -88,7 +89,7 @@ export function PettiTalk({ latestAnalysis }: PettiTalkProps) {
 
   return (
     <>
-      <Animated.View style={[styles.fab, { transform: [{ scale: scaleAnim }] }]}>
+      <Animated.View style={[styles.fab, { transform: [{ scale: scaleAnim }] }, hidden && { opacity: 0, pointerEvents: "none" }]}>
         <TouchableOpacity
           style={[styles.fabBtn, { backgroundColor: colors.primary }]}
           onPress={openChat}

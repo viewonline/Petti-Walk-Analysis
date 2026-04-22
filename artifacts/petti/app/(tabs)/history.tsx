@@ -358,7 +358,7 @@ export default function HistoryScreen() {
         </View>
       </ScrollView>
 
-      <PettiTalk latestAnalysis={mockAnalyses[0]} />
+      <PettiTalk latestAnalysis={mockAnalyses[0]} hidden={shareTarget !== null || showConsult} />
 
       <KakaoShareSheet
         visible={shareTarget !== null}
