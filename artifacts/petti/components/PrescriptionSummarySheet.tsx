@@ -3,6 +3,7 @@ import * as Haptics from "expo-haptics";
 import * as Linking from "expo-linking";
 import React from "react";
 import {
+  Platform,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -10,6 +11,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { mockPrescription } from "@/data/mockData";
 
 const PURCHASE_URL = "https://petti.vet/shop";
@@ -26,6 +28,10 @@ interface Props {
 }
 
 export function PrescriptionSummarySheet({ visible, onClose, onViewDetail, colors }: Props) {
+  const insets = useSafeAreaInsets();
+  const tabBarH = Platform.OS === "web" ? 84 : 49;
+  const bottomPad = insets.bottom + tabBarH;
+
   if (!visible) return null;
 
   const rx = mockPrescription;
@@ -145,7 +151,7 @@ export function PrescriptionSummarySheet({ visible, onClose, onViewDetail, color
         </ScrollView>
 
         {/* Action buttons — outside ScrollView, always visible */}
-        <View style={[styles.actionBar, { borderTopColor: colors.border + "40", backgroundColor: colors.background }]}>
+        <View style={[styles.actionBar, { borderTopColor: colors.border + "40", backgroundColor: colors.background, paddingBottom: bottomPad }]}>
           <TouchableOpacity
             style={[styles.detailBtn, { borderColor: colors.primary + "60" }]}
             onPress={handleDetail}
@@ -306,7 +312,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     gap: 12,
     padding: 18,
-    paddingBottom: 28,
     borderTopWidth: 1,
   },
   detailBtn: {

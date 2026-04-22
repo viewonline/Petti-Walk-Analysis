@@ -2,6 +2,7 @@ import { Feather } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
 import React, { useState } from "react";
 import {
+  Platform,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -10,6 +11,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import {
   CONSULT_HOSPITALS,
   ConsultHospital,
@@ -60,6 +62,9 @@ export function ConsultHospitalSheet({ visible, onClose, analysis, colors }: Pro
   const [activeFilter, setActiveFilter] = useState<Specialty | "전체">("전체");
   const [searchQuery, setSearchQuery] = useState("");
   const [bookmarked, setBookmarked] = useState<Set<string>>(new Set());
+  const insets = useSafeAreaInsets();
+  const tabBarH = Platform.OS === "web" ? 84 : 49;
+  const scrollBottomPad = insets.bottom + tabBarH + 16;
 
   if (!visible) return null;
 
@@ -113,7 +118,7 @@ export function ConsultHospitalSheet({ visible, onClose, analysis, colors }: Pro
           style={{ flex: 1 }}
           showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"
-          contentContainerStyle={{ paddingBottom: 48 }}
+          contentContainerStyle={{ paddingBottom: scrollBottomPad }}
         >
           {/* Analysis context banner */}
           {analysis && (
