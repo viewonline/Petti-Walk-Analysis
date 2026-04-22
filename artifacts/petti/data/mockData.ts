@@ -126,6 +126,130 @@ export const STATUS_COLORS: Record<string, { bg: string; text: string }> = {
 
 export const OPTIMAL_ROM = { min: 125, max: 140 };
 
+export interface PrescriptionItem {
+  id: string;
+  category: "kit" | "surgery" | "food" | "supplement" | "other";
+  name: string;
+  description: string;
+  price: number;
+  originalPrice?: number;
+  icon: string;
+  iconColor: string;
+  iconBg: string;
+  included: boolean;
+}
+
+export interface Prescription {
+  id: string;
+  petId: string;
+  analysisId: string;
+  date: string;
+  vetName: string;
+  vetTitle: string;
+  hospital: string;
+  clinicalNote: string;
+  kitName: string;
+  kitDescription: string;
+  kitPrice: number;
+  kitOriginalPrice: number;
+  items: PrescriptionItem[];
+  extraItems: PrescriptionItem[];
+  stats: { label: string; value: string }[];
+}
+
+export const mockPrescription: Prescription = {
+  id: "rx-1",
+  petId: "pet-1",
+  analysisId: "ana-1",
+  date: "2024년 10월 24일",
+  vetName: "김성민 수의사",
+  vetTitle: "정형외과 전문의",
+  hospital: "뷰 동물병원",
+  clinicalNote:
+    "올리버의 최신 보행 분석 결과를 검토했습니다. 슬개골 수술 후 회복 3단계로 관절 가동성은 안정적이나, 우측 보상 패턴 개선을 위해 전문 재활 키트 사용을 권장합니다. 꾸준한 홈케어가 완전 회복의 핵심입니다.",
+  kitName: "펫티 재활 키트 Premium",
+  kitDescription:
+    "수의사 처방 기반 맞춤형 재활 패키지. 상세 진단 리포트 포함.",
+  kitPrice: 249000,
+  kitOriginalPrice: 300000,
+  items: [
+    {
+      id: "item-1",
+      category: "kit",
+      name: "레이저 조사기",
+      description: "심부 열 자극으로 염증 억제 및 통증 완화",
+      price: 0,
+      icon: "zap",
+      iconColor: "#ef4444",
+      iconBg: "#fef2f2",
+      included: true,
+    },
+    {
+      id: "item-2",
+      category: "kit",
+      name: "재활 짐볼",
+      description: "코어 근력 및 균형 감각 강화 훈련",
+      price: 0,
+      icon: "circle",
+      iconColor: "#3b82f6",
+      iconBg: "#eff6ff",
+      included: true,
+    },
+    {
+      id: "item-3",
+      category: "kit",
+      name: "무릎 보조기",
+      description: "비정상적 관절 가동 제한, 인대 보호",
+      price: 0,
+      icon: "shield",
+      iconColor: "#d97706",
+      iconBg: "#fffbeb",
+      included: true,
+    },
+    {
+      id: "item-4",
+      category: "kit",
+      name: "재활 전용 매트",
+      description: "고탄성 미끄럼 방지, 관절 충격 최소화",
+      price: 0,
+      icon: "layers",
+      iconColor: "#059669",
+      iconBg: "#ecfdf5",
+      included: true,
+    },
+  ],
+  extraItems: [
+    {
+      id: "extra-1",
+      category: "supplement",
+      name: "관절 영양제 (글루코사민+MSM)",
+      description: "연골 보호 및 관절 유연성 개선 · 60정 1개월분",
+      price: 45000,
+      icon: "package",
+      iconColor: "#8b5cf6",
+      iconBg: "#f5f3ff",
+      included: false,
+    },
+    {
+      id: "extra-2",
+      category: "food",
+      name: "관절 케어 처방 사료",
+      description: "저인·고단백 처방식 · 오메가-3 강화 · 2kg",
+      price: 89000,
+      icon: "heart",
+      iconColor: "#ec4899",
+      iconBg: "#fdf2f8",
+      included: false,
+    },
+  ],
+  stats: [
+    { label: "통증 완화 만족도", value: "92%" },
+    { label: "활동성 개선 지표", value: "88%" },
+    { label: "ROM 평균 향상", value: "35%" },
+    { label: "임상 적용 환견", value: "100두" },
+  ],
+};
+
 export const MOCK_CHAT_RESPONSES = [
   "올리버의 현재 ROM 수치와 보상 패턴을 분석했습니다. 꾸준한 회복세를 보이고 있어 긍정적입니다. 물리치료를 지속하시고, 다음 검진까지 무리한 운동은 피해주세요.",
   "ROM 132°는 정상 범위(125°–140°) 내에 있습니다. 현재의 재활 프로그램을 유지하시면 좋을 것 같습니다. 하루 2회, 10분씩 가벼운 보행 운동을 권장합니다.",

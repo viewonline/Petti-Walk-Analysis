@@ -23,6 +23,10 @@ function NativeTabLayout() {
         <Icon sf={{ default: "clock", selected: "clock.fill" }} />
         <Label>기록</Label>
       </NativeTabs.Trigger>
+      <NativeTabs.Trigger name="prescription">
+        <Icon sf={{ default: "cross.case", selected: "cross.case.fill" }} />
+        <Label>처방</Label>
+      </NativeTabs.Trigger>
       <NativeTabs.Trigger name="profile">
         <Icon sf={{ default: "pawprint", selected: "pawprint.fill" }} />
         <Label>프로필</Label>
@@ -93,6 +97,15 @@ function ClassicTabLayout() {
           title: "기록",
           tabBarIcon: ({ color }) => (
             <Feather name="clock" size={22} color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="prescription"
+        options={{
+          title: "처방",
+          tabBarIcon: ({ color }) => (
+            <Feather name="package" size={22} color={color} />
           ),
         }}
       />
