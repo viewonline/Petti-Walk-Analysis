@@ -20,6 +20,7 @@ import { AnalysisCard } from "@/components/AnalysisCard";
 import { TrendChart } from "@/components/TrendChart";
 import { PettiTalk } from "@/components/PettiTalk";
 import { KakaoShareSheet } from "@/components/KakaoShareSheet";
+import { ConsultHospitalSheet } from "@/components/ConsultHospitalSheet";
 import { mockAnalyses, mockTrend, Analysis, mockPet } from "@/data/mockData";
 
 const HOSPITAL_URL = "https://pf.kakao.com/petti";
@@ -155,11 +156,15 @@ export default function HistoryScreen() {
   const [pdfLoading, setPdfLoading] = useState(false);
   const [shareTarget, setShareTarget] = useState<Analysis | null>(null);
 
+  const [showConsult, setShowConsult] = useState(false);
+
   const openKakaoShare = (a: Analysis) => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     setShareTarget(a);
   };
   const closeKakaoShare = () => setShareTarget(null);
+  const openConsult = () => setShowConsult(true);
+  const closeConsult = () => setShowConsult(false);
 
   const topPad = Platform.OS === "web" ? Math.max(insets.top, 44) : insets.top;
   const bottomPad = Platform.OS === "web" ? 34 : 0;
@@ -355,7 +360,15 @@ export default function HistoryScreen() {
       <KakaoShareSheet
         visible={shareTarget !== null}
         onClose={closeKakaoShare}
+        onOpenConsult={openConsult}
         analysis={shareTarget}
+        colors={colors}
+      />
+
+      <ConsultHospitalSheet
+        visible={showConsult}
+        onClose={closeConsult}
+        analysis={shareTarget ?? mockAnalyses[0]}
         colors={colors}
       />
     </View>

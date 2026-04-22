@@ -21,11 +21,12 @@ const MOCK_REPORT_URL = "https://petti.vet/report/demo";
 interface Props {
   visible: boolean;
   onClose: () => void;
+  onOpenConsult: () => void;
   analysis: Analysis | null;
   colors: any;
 }
 
-export function KakaoShareSheet({ visible, onClose, analysis, colors }: Props) {
+export function KakaoShareSheet({ visible, onClose, onOpenConsult, analysis, colors }: Props) {
   if (!visible || !analysis) return null;
 
   const statusLabel =
@@ -75,6 +76,7 @@ export function KakaoShareSheet({ visible, onClose, analysis, colors }: Props) {
       title: "관절 스켈레톤 영상",
       desc: "AI 분석으로 생성된 관절 움직임 시각화 영상",
       badge: "영상",
+      onPress: undefined as (() => void) | undefined,
     },
     {
       icon: "file-text" as const,
@@ -83,14 +85,16 @@ export function KakaoShareSheet({ visible, onClose, analysis, colors }: Props) {
       title: "보행 분석 리포트",
       desc: `ROM ${analysis.averageRom}° · BCS ${analysis.bcs.toFixed(1)} · ${statusLabel}`,
       badge: "PDF",
+      onPress: undefined as (() => void) | undefined,
     },
     {
-      icon: "message-circle" as const,
+      icon: "search" as const,
       color: "#c17f24",
       bg: "#fff3e0",
-      title: "맞춤 상담 받기",
-      desc: "수의사와 1:1 카카오톡 채널 상담 연결",
-      badge: "바로가기",
+      title: "맞춤 상담 병원 찾기",
+      desc: "리뷰·거리·진료과목별 병원 선택 후 카카오톡 문의",
+      badge: "병원 보기 →",
+      onPress: () => { onClose(); setTimeout(onOpenConsult, 100); },
     },
   ];
 
@@ -159,9 +163,18 @@ export function KakaoShareSheet({ visible, onClose, analysis, colors }: Props) {
         {/* Share items */}
         <View style={styles.itemList}>
           {ITEMS.map((item) => (
-            <View
+            <TouchableOpacity
               key={item.title}
-              style={[styles.shareItem, { backgroundColor: colors.surfaceContainerLow, borderColor: colors.border + "40" }]}
+              style={[
+                styles.shareItem,
+                {
+                  backgroundColor: item.onPress ? "#fffbeb" : colors.surfaceContainerLow,
+                  borderColor: item.onPress ? "#f59e0b60" : colors.border + "40",
+                },
+              ]}
+              onPress={item.onPress}
+              activeOpacity={item.onPress ? 0.75 : 1}
+              disabled={!item.onPress}
             >
               <View style={[styles.shareItemIcon, { backgroundColor: item.bg }]}>
                 <Feather name={item.icon} size={16} color={item.color} />
@@ -179,7 +192,7 @@ export function KakaoShareSheet({ visible, onClose, analysis, colors }: Props) {
                   {item.badge}
                 </Text>
               </View>
-            </View>
+            </TouchableOpacity>
           ))}
         </View>
 
