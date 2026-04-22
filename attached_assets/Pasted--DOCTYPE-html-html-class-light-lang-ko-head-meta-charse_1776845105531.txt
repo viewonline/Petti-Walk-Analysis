@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+
+<html class="light" lang="ko"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@300;400;500;600;700;800;900&amp;family=Noto+Sans+KR:wght@300;400;500;700;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              primary: {
+                DEFAULT: "#001f3f",
+                container: "#f4f4ef",
+              },
+              surface: "#fafaf5",
+              accent: "#735c00"
+            },
+            fontFamily: {
+              "headline": ["Public Sans", "Noto Sans KR"],
+              "body": ["Public Sans", "Noto Sans KR"],
+              "label": ["Public Sans", "Noto Sans KR"]
+            },
+            borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "2xl": "1rem", "3xl": "1.5rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        body {
+            background-color: #fafaf5;
+            font-family: 'Noto Sans KR', sans-serif;
+            color: #001f3f;
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+</head>
+<body class="antialiased pb-32">
+<!-- TopAppBar -->
+<header class="flex justify-between items-center px-6 py-4 w-full bg-[#fafaf5] dark:bg-slate-950 font-['Noto_Sans_KR'] font-bold tracking-tight docked full-width top-0 sticky z-50">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-2xl text-[#001f3f] dark:text-slate-100" data-icon="pets" style="">pets</span>
+<h1 class="text-2xl font-black text-[#001f3f] dark:text-slate-100" style="">Petti</h1>
+</div>
+<div class="flex items-center gap-4">
+<button class="text-[#001f3f] dark:text-slate-100 hover:opacity-80 transition-opacity active:scale-95 duration-200" style="">
+<span class="material-symbols-outlined" data-icon="notifications" style="">notifications</span>
+</button>
+<button class="text-[#001f3f] dark:text-slate-100 hover:opacity-80 transition-opacity active:scale-95 duration-200" style="">
+<span class="material-symbols-outlined" data-icon="shopping_cart" style="">shopping_cart</span>
+</button>
+</div>
+</header>
+<main class="max-w-4xl mx-auto px-4 pt-4">
+<!-- Hero Section: Premium Product Reveal -->
+<section class="relative mb-8">
+<div class="inline-block px-3 py-1 mb-4 rounded-full bg-primary text-white text-xs font-bold uppercase tracking-wider" style="">
+                Expert Curated
+            </div>
+<h2 class="text-3xl font-black text-primary leading-tight mb-6" style="">수의사 맞춤 재활 솔루션</h2>
+<div class="grid grid-cols-1 md:grid-cols-12 gap-6">
+<!-- Main Product Image -->
+<div class="md:col-span-8 overflow-hidden rounded-3xl shadow-2xl relative group h-[400px]">
+<img alt="Professional Pet Rehab Kit" class="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-700" data-alt="Premium professional pet rehabilitation equipment including a blue yoga ball, knee brace, and portable laser device on a clean minimalist clinical background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCRJQ-0Gme-5uGT_xNj-cS5p5QRSpy9_pCem4upI2Cq8dlaC49nlZuuaQ0N0Fa05hycVs4T2GZ-S6f6pY6iqQRRwFq_fr1nza9Q-ksPFj993vnu-2Y1jnR6lc8ojyHfHD2ZoFlY4RPWRYLaDYTqoWxgYYjxikjEyM6L1dy0dk77woeqxunEbbam9g-_dg_cA2_PKRSWH9JcvnsbRU8ikX99Uz5PTgSucla7Mft3XuCJ-Ql90Groge7Q6KORky8EcPSMLm4R3WgntxkH" style=""/>
+<div class="absolute bottom-6 left-6 flex gap-2">
+<span class="glass-card px-4 py-2 rounded-full text-xs font-bold flex items-center gap-1 shadow-sm" style="">
+<span class="material-symbols-outlined text-sm" data-icon="verified" style='font-variation-settings: "FILL" 1;'>verified</span>
+                            Premium Medical Grade
+                        </span>
+</div>
+</div>
+<!-- Price & Trust Badge -->
+<div class="md:col-span-4 flex flex-col justify-between space-y-4">
+<div class="bg-white p-6 rounded-3xl shadow-sm border border-stone-100 flex-grow">
+<p class="text-slate-500 text-xs mb-2 font-bold flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]" data-icon="medical_services">medical_services</span>
+    수의사 처방 할인 적용
+</p>
+<div class="flex items-center gap-2 mb-1">
+<span class="text-sm text-slate-400 line-through decoration-slate-400">300,000원</span>
+<span class="bg-accent/10 text-accent px-2 py-0.5 rounded-lg text-[10px] font-black uppercase tracking-tight">17% 할인</span>
+</div>
+<h3 class="text-4xl font-black text-primary mb-6">
+    249,000<span class="text-xl">원</span>
+</h3>
+<div class="flex items-center gap-2 mb-6 p-3 bg-primary-container rounded-2xl">
+<div class="w-10 h-10 rounded-full overflow-hidden bg-white border border-stone-200">
+<img alt="Veterinarian Profile" class="w-full h-full object-cover" data-alt="Professional portrait of a middle-aged male veterinarian in a white lab coat with a friendly expression" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBcTmo53xHBd-eZlNKi5Mn4i6hwM6V083fNuhmIru_ZjUbV39Oa-0ksvH-fIIGeLjIdcQiSlT3PXYWF-TLpd_MVePqETgFxtUy8dcdqDwmYCdrJhvb1QiF-ndruUeTrd4_4JGlQRle9Yhiuf7jyViWgK3NIcSnq1Ae5PnQ5jYdEbNgtbDWOSM40qqbG2saxZD1JJkEr140CrJGxjGi9281sQNzQ9pD3OQP6_cQGjFQvvtLmdNNInwZAXUK6ymqKamt7RRrFZKY5wipx"/>
+</div>
+<div>
+<p class="text-[10px] text-primary/60 font-bold leading-none mb-1">Guaranteed by</p>
+<p class="text-xs font-bold text-primary">김성민 수의사 / 뷰 동물병원</p>
+</div>
+</div>
+<div class="flex items-start gap-2 text-primary/80">
+<span class="material-symbols-outlined text-accent" data-icon="description">description</span>
+<p class="text-xs leading-relaxed">
+        본 패키지는 상세 진단에 기반한 <span class="font-bold underline decoration-accent/30 text-primary">맞춤형 재활 리포트</span>를 포함하고 있습니다.
+    </p>
+</div>
+</div>
+<button class="w-full bg-primary text-white py-5 rounded-3xl font-bold shadow-xl shadow-primary/20 flex items-center justify-center gap-2 hover:opacity-90 transition-all active:scale-95" style="">
+                        지금 구매하고 홈케어 시작
+                        <span class="material-symbols-outlined" data-icon="arrow_forward" style="">arrow_forward</span>
+</button>
+</div>
+</div>
+</section>
+<!-- Product Bento Grid Breakdown -->
+<section class="mb-12">
+<h4 class="text-xl font-bold mb-6 flex items-center gap-2" style="">
+<span class="w-1.5 h-6 bg-accent rounded-full"></span>
+                키트 구성 및 임상적 효과
+            </h4>
+<div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+<!-- Item 1: Laser -->
+<div class="bg-white p-5 rounded-3xl border border-stone-100 shadow-sm hover:shadow-md transition-shadow">
+<div class="w-12 h-12 bg-rose-50 rounded-2xl flex items-center justify-center mb-4">
+<span class="material-symbols-outlined text-rose-500" data-icon="flash_on" style='font-variation-settings: "FILL" 1;'>flash_on</span>
+</div>
+<h5 class="font-bold text-sm mb-2" style="">레이저 조사기</h5>
+<p class="text-xs text-slate-500 leading-relaxed" style="">심부 열 자극을 통해 염증을 억제하고 <span class="text-rose-600 font-medium" style="">통증 완화</span>에 탁월</p>
+</div>
+<!-- Item 2: Gym Ball -->
+<div class="bg-white p-5 rounded-3xl border border-stone-100 shadow-sm hover:shadow-md transition-shadow">
+<div class="w-12 h-12 bg-blue-50 rounded-2xl flex items-center justify-center mb-4">
+<span class="material-symbols-outlined text-blue-500" data-icon="sports_baseball" style='font-variation-settings: "FILL" 1;'>sports_baseball</span>
+</div>
+<h5 class="font-bold text-sm mb-2" style="">재활 짐볼</h5>
+<p class="text-xs text-slate-500 leading-relaxed" style="">불안정한 지면을 활용하여 <span class="text-blue-600 font-medium" style="">코어 근력</span> 및 균형 감각 강화</p>
+</div>
+<!-- Item 3: Knee Brace -->
+<div class="bg-white p-5 rounded-3xl border border-stone-100 shadow-sm hover:shadow-md transition-shadow">
+<div class="w-12 h-12 bg-amber-50 rounded-2xl flex items-center justify-center mb-4">
+<span class="material-symbols-outlined text-amber-600" data-icon="health_and_safety" style='font-variation-settings: "FILL" 1;'>health_and_safety</span>
+</div>
+<h5 class="font-bold text-sm mb-2" style="">무릎 보조기</h5>
+<p class="text-xs text-slate-500 leading-relaxed" style="">관절의 비정상적 가동을 제한하여 <span class="text-amber-700 font-medium" style="">인대 보호</span> 및 회복 지원</p>
+</div>
+<!-- Item 4: Mat -->
+<div class="bg-white p-5 rounded-3xl border border-stone-100 shadow-sm hover:shadow-md transition-shadow">
+<div class="w-12 h-12 bg-emerald-50 rounded-2xl flex items-center justify-center mb-4">
+<span class="material-symbols-outlined text-emerald-600" data-icon="layers" style='font-variation-settings: "FILL" 1;'>layers</span>
+</div>
+<h5 class="font-bold text-sm mb-2" style="">재활 전용 매트</h5>
+<p class="text-xs text-slate-500 leading-relaxed" style="">고탄성 미끄럼 방지 소재로 <span class="text-emerald-700 font-medium" style="">관절 충격</span> 최소화 및 낙상 방지</p>
+</div>
+</div>
+</section>
+<!-- Scientific Proof Section -->
+<section class="bg-primary p-8 rounded-[40px] text-white relative overflow-hidden mb-12">
+<div class="absolute top-0 right-0 w-64 h-64 bg-accent/20 rounded-full blur-3xl -mr-20 -mt-20"></div>
+<div class="relative z-10">
+<div class="flex items-center gap-3 mb-4">
+<span class="material-symbols-outlined text-accent" data-icon="science" style='font-variation-settings: "FILL" 1;'>science</span>
+<h4 class="text-xl font-bold" style="">임상 결과 검증 완료</h4>
+</div>
+<p class="text-white/70 text-sm max-w-md mb-6 leading-relaxed" style="">
+                    뷰 동물병원 재활 센터에서 실제 환견 100두를 대상으로 실시한 8주간의 재활 키트 사용 결과, 관절 가동 범위가 평균 35% 향상되었습니다.
+                </p>
+<div class="flex gap-8">
+<div>
+<p class="text-2xl font-black text-white" style="">92%</p>
+<p class="text-[10px] text-white/50 uppercase tracking-widest" style="">통증 완화 만족도</p>
+</div>
+<div class="w-px h-10 bg-white/20"></div>
+<div>
+<p class="text-2xl font-black text-white" style="">88%</p>
+<p class="text-[10px] text-white/50 uppercase tracking-widest" style="">활동성 개선 지표</p>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 w-full z-50 flex justify-around items-center px-4 pb-6 pt-3 bg-[#ffffff]/80 dark:bg-slate-900/80 backdrop-blur-xl rounded-t-[28px] shadow-[0px_-4px_20px_rgba(26,28,25,0.06)] no-line-rule tonal-layering">
+<a class="flex flex-col items-center justify-center text-[#735c00] opacity-60 p-2 hover:bg-[#f4f4ef] dark:hover:bg-slate-800 rounded-2xl transition-transform active:scale-90" href="#" style="">
+<span class="material-symbols-outlined" data-icon="home" style="">home</span>
+<span class="font-['Noto_Sans_KR'] text-[10px] font-medium mt-1" style="">Home</span>
+</a>
+<a class="flex flex-col items-center justify-center text-[#735c00] opacity-60 p-2 hover:bg-[#f4f4ef] dark:hover:bg-slate-800 rounded-2xl transition-transform active:scale-90" href="#" style="">
+<span class="material-symbols-outlined" data-icon="recenter" style="">recenter</span>
+<span class="font-['Noto_Sans_KR'] text-[10px] font-medium mt-1" style="">Analysis</span>
+</a>
+<a class="flex flex-col items-center justify-center bg-[#001f3f] text-white rounded-2xl p-2 px-4 transition-transform active:scale-90 shadow-lg shadow-primary/20" href="#" style="">
+<span class="material-symbols-outlined" data-icon="fitness_center" style="">fitness_center</span>
+<span class="font-['Noto_Sans_KR'] text-[10px] font-medium mt-1" style="">Training</span>
+</a>
+<a class="flex flex-col items-center justify-center text-[#735c00] opacity-60 p-2 hover:bg-[#f4f4ef] dark:hover:bg-slate-800 rounded-2xl transition-transform active:scale-90" href="#" style="">
+<span class="material-symbols-outlined" data-icon="description" style="">description</span>
+<span class="font-['Noto_Sans_KR'] text-[10px] font-medium mt-1" style="">Report</span>
+</a>
+<a class="flex flex-col items-center justify-center text-[#735c00] opacity-60 p-2 hover:bg-[#f4f4ef] dark:hover:bg-slate-800 rounded-2xl transition-transform active:scale-90" href="#" style="">
+<span class="material-symbols-outlined" data-icon="person" style="">person</span>
+<span class="font-['Noto_Sans_KR'] text-[10px] font-medium mt-1" style="">My</span>
+</a>
+</nav>
+</body></html>
