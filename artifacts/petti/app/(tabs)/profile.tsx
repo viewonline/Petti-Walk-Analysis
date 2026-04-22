@@ -17,6 +17,8 @@ import { mockAnalyses, OPTIMAL_ROM } from "@/data/mockData";
 import { usePet, PetInfo } from "@/context/PetContext";
 import { useAuth } from "@/context/AuthContext";
 
+const GENDER_OPTIONS = ["수컷", "수컷(중성화)", "암컷", "암컷(중성화)", "모름"];
+
 const FIELDS = [
   { key: "name" as keyof PetInfo, icon: "tag", label: "이름", unit: "" },
   { key: "breed" as keyof PetInfo, icon: "activity", label: "견종", unit: "" },
@@ -154,59 +156,110 @@ export default function ProfileScreen() {
           )}
         </View>
 
-        {FIELDS.map((f, i) => (
-          <View
-            key={f.key}
-            style={[
-              styles.infoRow,
-              i < FIELDS.length - 1 && {
-                borderBottomWidth: 1,
-                borderBottomColor: colors.border + "30",
-              },
-            ]}
-          >
-            <View style={[styles.infoIcon, { backgroundColor: colors.surfaceContainerLow }]}>
-              <Feather name={f.icon as any} size={16} color={colors.primary} />
-            </View>
-            <Text style={[styles.infoLabel, { color: colors.mutedForeground }]}>
-              {f.label}
-            </Text>
-            {editing ? (
-              <View style={styles.inputWrap}>
-                <TextInput
-                  style={[
-                    styles.inlineInput,
-                    {
-                      color: colors.foreground,
-                      backgroundColor: colors.surfaceContainerLow,
-                      borderColor: colors.primary + "60",
-                    },
-                  ]}
-                  value={draft[f.key]}
-                  onChangeText={(v) => setField(f.key, v)}
-                  keyboardType={
-                    f.key === "age"
-                      ? "numeric"
-                      : f.key === "weight"
-                      ? "decimal-pad"
-                      : "default"
-                  }
-                  returnKeyType="done"
-                  selectTextOnFocus
-                />
-                {f.unit !== "" && (
-                  <Text style={[styles.unitText, { color: colors.mutedForeground }]}>
-                    {f.unit}
-                  </Text>
-                )}
+        {FIELDS.map((f, i) => {
+          const isGenderField = f.key === "gender";
+          const isLast = i === FIELDS.length - 1;
+          if (isGenderField && editing) {
+            return (
+              <View
+                key={f.key}
+                style={[
+                  styles.infoRow,
+                  { flexDirection: "column", alignItems: "flex-start", gap: 10 },
+                  !isLast && { borderBottomWidth: 1, borderBottomColor: colors.border + "30" },
+                ]}
+              >
+                <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
+                  <View style={[styles.infoIcon, { backgroundColor: colors.surfaceContainerLow }]}>
+                    <Feather name={f.icon as any} size={16} color={colors.primary} />
+                  </View>
+                  <Text style={[styles.infoLabel, { color: colors.mutedForeground }]}>{f.label}</Text>
+                </View>
+                <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 8, paddingBottom: 4 }}>
+                  {GENDER_OPTIONS.map((opt) => {
+                    const selected = draft.gender === opt;
+                    return (
+                      <TouchableOpacity
+                        key={opt}
+                        onPress={() => setField("gender", opt)}
+                        style={[
+                          styles.genderBtn,
+                          {
+                            backgroundColor: selected ? colors.primary : colors.surfaceContainerLow,
+                            borderColor: selected ? colors.primary : colors.border,
+                          },
+                        ]}
+                        activeOpacity={0.75}
+                      >
+                        <Text
+                          style={[
+                            styles.genderBtnText,
+                            { color: selected ? "#fff" : colors.mutedForeground },
+                          ]}
+                        >
+                          {opt}
+                        </Text>
+                      </TouchableOpacity>
+                    );
+                  })}
+                </View>
               </View>
-            ) : (
-              <Text style={[styles.infoValue, { color: colors.foreground }]}>
-                {petInfo[f.key]}{f.unit !== "" ? ` ${f.unit}` : ""}
+            );
+          }
+          return (
+            <View
+              key={f.key}
+              style={[
+                styles.infoRow,
+                !isLast && {
+                  borderBottomWidth: 1,
+                  borderBottomColor: colors.border + "30",
+                },
+              ]}
+            >
+              <View style={[styles.infoIcon, { backgroundColor: colors.surfaceContainerLow }]}>
+                <Feather name={f.icon as any} size={16} color={colors.primary} />
+              </View>
+              <Text style={[styles.infoLabel, { color: colors.mutedForeground }]}>
+                {f.label}
               </Text>
-            )}
-          </View>
-        ))}
+              {editing ? (
+                <View style={styles.inputWrap}>
+                  <TextInput
+                    style={[
+                      styles.inlineInput,
+                      {
+                        color: colors.foreground,
+                        backgroundColor: colors.surfaceContainerLow,
+                        borderColor: colors.primary + "60",
+                      },
+                    ]}
+                    value={draft[f.key]}
+                    onChangeText={(v) => setField(f.key, v)}
+                    keyboardType={
+                      f.key === "age"
+                        ? "numeric"
+                        : f.key === "weight"
+                        ? "decimal-pad"
+                        : "default"
+                    }
+                    returnKeyType="done"
+                    selectTextOnFocus
+                  />
+                  {f.unit !== "" && (
+                    <Text style={[styles.unitText, { color: colors.mutedForeground }]}>
+                      {f.unit}
+                    </Text>
+                  )}
+                </View>
+              ) : (
+                <Text style={[styles.infoValue, { color: colors.foreground }]}>
+                  {petInfo[f.key]}{f.unit !== "" ? ` ${f.unit}` : ""}
+                </Text>
+              )}
+            </View>
+          );
+        })}
 
         {editing && (
           <TouchableOpacity
@@ -394,6 +447,16 @@ const styles = StyleSheet.create({
     textAlign: "right",
   },
   unitText: { fontSize: 13, fontWeight: "500" },
+  genderBtn: {
+    paddingHorizontal: 12,
+    paddingVertical: 7,
+    borderRadius: 20,
+    borderWidth: 1,
+  },
+  genderBtnText: {
+    fontSize: 13,
+    fontWeight: "500",
+  },
   saveFullBtn: {
     flexDirection: "row",
     alignItems: "center",
