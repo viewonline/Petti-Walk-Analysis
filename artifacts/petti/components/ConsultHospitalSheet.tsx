@@ -18,8 +18,6 @@ import {
 } from "@/data/hospitals";
 import { Analysis, mockPet } from "@/data/mockData";
 
-const KAKAO_YELLOW = "#FAE100";
-
 interface Props {
   visible: boolean;
   onClose: () => void;
@@ -186,7 +184,6 @@ export function ConsultHospitalSheet({ visible, onClose, analysis, colors }: Pro
           <View style={styles.list}>
             {filtered.map((h) => {
               const isBookmarked = bookmarked.has(h.id);
-              const isInquired = inquired.has(h.id);
 
               return (
                 <View
