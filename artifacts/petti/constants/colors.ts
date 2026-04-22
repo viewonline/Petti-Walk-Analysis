@@ -50,4 +50,6 @@ const colors = {
   radius: 16,
 };
 
+export type ColorTokens = typeof colors.light;
+
 export default colors;

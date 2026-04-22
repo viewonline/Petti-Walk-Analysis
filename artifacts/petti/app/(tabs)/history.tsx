@@ -21,6 +21,8 @@ import { TrendChart } from "@/components/TrendChart";
 import { PettiTalk } from "@/components/PettiTalk";
 import { KakaoShareSheet } from "@/components/KakaoShareSheet";
 import { ConsultHospitalSheet } from "@/components/ConsultHospitalSheet";
+import { HospitalDetailSheet } from "@/components/HospitalDetailSheet";
+import { ConsultHospital } from "@/data/hospitals";
 import { mockAnalyses, mockTrend, Analysis, mockPet } from "@/data/mockData";
 
 const HOSPITAL_URL = "https://pf.kakao.com/petti";
@@ -157,6 +159,8 @@ export default function HistoryScreen() {
   const [shareTarget, setShareTarget] = useState<Analysis | null>(null);
 
   const [showConsult, setShowConsult] = useState(false);
+  const [detailHospital, setDetailHospital] = useState<ConsultHospital | null>(null);
+  const [detailTab, setDetailTab] = useState<"info" | "reviews" | "consult">("info");
 
   const openKakaoShare = (a: Analysis) => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
@@ -358,7 +362,10 @@ export default function HistoryScreen() {
         </View>
       </ScrollView>
 
-      <PettiTalk latestAnalysis={mockAnalyses[0]} hidden={shareTarget !== null || showConsult} />
+      <PettiTalk
+        latestAnalysis={mockAnalyses[0]}
+        hidden={shareTarget !== null || showConsult || detailHospital !== null}
+      />
 
       <KakaoShareSheet
         visible={shareTarget !== null}
@@ -373,6 +380,20 @@ export default function HistoryScreen() {
         onClose={closeConsult}
         analysis={shareTarget ?? mockAnalyses[0]}
         colors={colors}
+        onHospitalPress={(h, tab) => {
+          setDetailTab(tab ?? "info");
+          setDetailHospital(h);
+        }}
+      />
+
+      <HospitalDetailSheet
+        hospital={detailHospital}
+        initialTab={detailTab}
+        colors={colors}
+        onClose={() => setDetailHospital(null)}
+        onOpenCommunity={(_hospitalName) => {
+          setDetailHospital(null);
+        }}
       />
     </View>
   );
