@@ -40,15 +40,21 @@ export default function SignupScreen() {
     if (error) setError("");
   };
 
-  const isValid = form.name.trim() && form.email.includes("@") && form.password.length >= 8 && form.password === form.confirm;
-
   const handleSignup = () => {
-    if (form.password !== form.confirm) {
-      setError("비밀번호가 일치하지 않습니다");
+    if (!form.name.trim()) {
+      setError("이름을 입력해주세요");
+      return;
+    }
+    if (!form.email.trim() || !form.email.includes("@")) {
+      setError("올바른 이메일 주소를 입력해주세요");
       return;
     }
     if (form.password.length < 8) {
       setError("비밀번호는 8자 이상이어야 합니다");
+      return;
+    }
+    if (form.password !== form.confirm) {
+      setError("비밀번호가 일치하지 않습니다");
       return;
     }
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
@@ -144,11 +150,11 @@ export default function SignupScreen() {
             style={[
               styles.signupBtn,
               { backgroundColor: colors.primary },
-              (!isValid || loading) && styles.btnDisabled,
+              loading && styles.btnDisabled,
             ]}
             onPress={handleSignup}
             activeOpacity={0.85}
-            disabled={!isValid || loading}
+            disabled={loading}
           >
             <Text style={styles.signupBtnText}>
               {loading ? "가입 중..." : "이메일로 가입하기"}
