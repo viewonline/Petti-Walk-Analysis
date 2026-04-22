@@ -1,9 +1,7 @@
 import { Feather } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
-import * as Linking from "expo-linking";
 import React, { useState } from "react";
 import {
-  Platform,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -48,7 +46,6 @@ export function ConsultHospitalSheet({ visible, onClose, analysis, colors }: Pro
   const [activeFilter, setActiveFilter] = useState<Specialty | "전체">("전체");
   const [searchQuery, setSearchQuery] = useState("");
   const [bookmarked, setBookmarked] = useState<Set<string>>(new Set());
-  const [inquired, setInquired] = useState<Set<string>>(new Set());
 
   if (!visible) return null;
 
@@ -68,20 +65,6 @@ export function ConsultHospitalSheet({ visible, onClose, analysis, colors }: Pro
       next.has(id) ? next.delete(id) : next.add(id);
       return next;
     });
-  };
-
-  const handleInquire = async (h: ConsultHospital) => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-    setInquired((prev) => new Set(prev).add(h.id));
-    if (Platform.OS === "web") {
-      alert(`${h.name}에 카카오톡 문의를 요청했습니다.\n실제 앱에서는 카카오 채널로 연결됩니다.`);
-      return;
-    }
-    try {
-      await Linking.openURL(h.kakaoChannel);
-    } catch {
-      alert("카카오톡 채널을 열 수 없습니다.");
-    }
   };
 
   const statusColor =
@@ -310,38 +293,22 @@ export function ConsultHospitalSheet({ visible, onClose, analysis, colors }: Pro
 
                   {/* Action row */}
                   <View style={styles.actionRow}>
-                    {h.bookable && (
-                      <TouchableOpacity
-                        style={[styles.bookBtn, { borderColor: colors.primary + "60" }]}
-                        activeOpacity={0.75}
-                      >
-                        <Feather name="calendar" size={12} color={colors.primary} />
-                        <Text style={[styles.bookBtnText, { color: colors.primary }]}>
-                          예약 {h.bookable ? "가능" : "불가"}
-                        </Text>
-                      </TouchableOpacity>
-                    )}
+                    <TouchableOpacity
+                      style={[styles.reportBtn, { borderColor: colors.primary + "60", backgroundColor: colors.surfaceContainerLow }]}
+                      activeOpacity={0.75}
+                    >
+                      <Feather name="file-text" size={13} color={colors.primary} />
+                      <Text style={[styles.reportBtnText, { color: colors.primary }]}>
+                        리포트 전송
+                      </Text>
+                    </TouchableOpacity>
 
                     <TouchableOpacity
-                      style={[
-                        styles.inquireBtn,
-                        {
-                          backgroundColor: isInquired ? colors.surfaceContainerLow : KAKAO_YELLOW,
-                          flex: h.bookable ? 1 : undefined,
-                          width: h.bookable ? undefined : "100%",
-                        },
-                      ]}
-                      onPress={() => handleInquire(h)}
+                      style={[styles.bookBtn, { backgroundColor: colors.primary }]}
                       activeOpacity={0.85}
                     >
-                      <View style={[styles.kakaoBtnIcon, { backgroundColor: isInquired ? colors.border + "40" : "rgba(0,0,0,0.12)" }]}>
-                        <Text style={[styles.kakaoBtnIconText, { color: isInquired ? colors.mutedForeground : "#3a1d1d" }]}>
-                          K
-                        </Text>
-                      </View>
-                      <Text style={[styles.inquireBtnText, { color: isInquired ? colors.mutedForeground : "#3a1d1d" }]}>
-                        {isInquired ? "문의 완료" : "카카오톡 문의"}
-                      </Text>
+                      <Feather name="calendar" size={13} color="#fff" />
+                      <Text style={styles.bookBtnText}>예약하기</Text>
                     </TouchableOpacity>
                   </View>
                 </View>
@@ -538,32 +505,27 @@ const styles = StyleSheet.create({
     paddingBottom: 14,
     paddingTop: 4,
   },
-  bookBtn: {
+  reportBtn: {
+    flex: 1,
     flexDirection: "row",
     alignItems: "center",
-    gap: 5,
+    justifyContent: "center",
+    gap: 6,
     borderWidth: 1,
     borderRadius: 10,
     paddingHorizontal: 12,
-    paddingVertical: 9,
+    paddingVertical: 10,
   },
-  bookBtnText: { fontSize: 12, fontWeight: "600" },
-  inquireBtn: {
+  reportBtnText: { fontSize: 13, fontWeight: "700" },
+  bookBtn: {
+    flex: 1,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    gap: 7,
+    gap: 6,
     borderRadius: 10,
-    paddingVertical: 9,
-    paddingHorizontal: 14,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
   },
-  kakaoBtnIcon: {
-    width: 20,
-    height: 20,
-    borderRadius: 5,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  kakaoBtnIconText: { fontSize: 11, fontWeight: "900" },
-  inquireBtnText: { fontSize: 12, fontWeight: "700" },
+  bookBtnText: { fontSize: 13, fontWeight: "700", color: "#fff" },
 });
