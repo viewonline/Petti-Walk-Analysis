@@ -15,6 +15,9 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useColors } from "@/hooks/useColors";
 import { useAuth } from "@/context/AuthContext";
 import { usePet, PetInfo } from "@/context/PetContext";
+import { BreedPicker } from "@/components/BreedPicker";
+import { BirthdatePicker } from "@/components/BirthdatePicker";
+import { HospitalSearch } from "@/components/HospitalSearch";
 
 const GENDER_OPTIONS = ["수컷", "암컷"] as const;
 const NEUTERED_OPTIONS = ["했음", "안했음"] as const;
@@ -122,43 +125,47 @@ export default function PetSetupScreen() {
     }, 600);
   };
 
-  const renderTextField = (f: typeof FIELDS_BEFORE[0] | typeof FIELDS_AFTER[0], showDivider: boolean) => (
-    <View
-      key={f.key}
-      style={[
-        styles.fieldRow,
-        showDivider && { borderBottomWidth: 1, borderBottomColor: colors.border + "30" },
-      ]}
-    >
-      <View style={[styles.fieldIcon, { backgroundColor: colors.primaryFixed }]}>
-        <Feather name={f.icon as any} size={14} color={colors.primary} />
-      </View>
-      <View style={styles.fieldContent}>
-        <Text style={[styles.fieldLabel, { color: colors.mutedForeground }]}>
-          {f.label}
-          {"required" in f && f.required && (
-            <Text style={{ color: colors.destructive }}> *</Text>
-          )}
-        </Text>
-        <View style={styles.inputWithUnit}>
-          <TextInput
-            style={[styles.fieldInput, { color: colors.foreground }]}
-            value={form[f.key]}
-            onChangeText={(v) => setField(f.key, v)}
-            placeholder={f.placeholder}
-            placeholderTextColor={colors.outlineVariant}
-            keyboardType={f.keyboard ?? "default"}
-            returnKeyType="next"
-          />
-          {f.unit && (
-            <Text style={[styles.unitLabel, { color: colors.mutedForeground }]}>
-              {f.unit}
-            </Text>
+  const renderTextField = (f: typeof FIELDS_BEFORE[0] | typeof FIELDS_AFTER[0], showDivider: boolean) => {
+    const dividerStyle = showDivider ? { borderBottomWidth: 1, borderBottomColor: colors.border + "30" } : {};
+    return (
+      <View key={f.key} style={[styles.fieldRow, { alignItems: "flex-start" }, dividerStyle]}>
+        <View style={[styles.fieldIcon, { backgroundColor: colors.primaryFixed, marginTop: 2 }]}>
+          <Feather name={f.icon as any} size={14} color={colors.primary} />
+        </View>
+        <View style={[styles.fieldContent, { gap: 0 }]}>
+          <Text style={[styles.fieldLabel, { color: colors.mutedForeground }]}>
+            {f.label}
+            {"required" in f && f.required && (
+              <Text style={{ color: colors.destructive }}> *</Text>
+            )}
+          </Text>
+
+          {f.key === "breed" ? (
+            <BreedPicker value={form.breed} onChange={(v) => setField("breed", v)} colors={colors} />
+          ) : f.key === "birthdate" ? (
+            <BirthdatePicker value={form.birthdate} onChange={(v) => setField("birthdate", v)} colors={colors} />
+          ) : f.key === "hospital" ? (
+            <HospitalSearch value={form.hospital} onChange={(v) => setField("hospital", v)} colors={colors} />
+          ) : (
+            <View style={styles.inputWithUnit}>
+              <TextInput
+                style={[styles.fieldInput, { color: colors.foreground }]}
+                value={form[f.key]}
+                onChangeText={(v) => setField(f.key, v)}
+                placeholder={f.placeholder}
+                placeholderTextColor={colors.outlineVariant}
+                keyboardType={f.keyboard ?? "default"}
+                returnKeyType="next"
+              />
+              {f.unit && (
+                <Text style={[styles.unitLabel, { color: colors.mutedForeground }]}>{f.unit}</Text>
+              )}
+            </View>
           )}
         </View>
       </View>
-    </View>
-  );
+    );
+  };
 
   const renderToggleRow = (
     label: string, icon: string,

@@ -16,6 +16,9 @@ import { useColors } from "@/hooks/useColors";
 import { mockAnalyses, OPTIMAL_ROM } from "@/data/mockData";
 import { usePet, PetInfo } from "@/context/PetContext";
 import { useAuth } from "@/context/AuthContext";
+import { BreedPicker } from "@/components/BreedPicker";
+import { BirthdatePicker } from "@/components/BirthdatePicker";
+import { HospitalSearch } from "@/components/HospitalSearch";
 
 const GENDER_OPTIONS = ["수컷", "암컷"] as const;
 const NEUTERED_OPTIONS = ["했음", "안했음"] as const;
@@ -35,14 +38,14 @@ const FOOD_OPTIONS = [
 
 const FIELDS = [
   { key: "name" as keyof PetInfo, icon: "tag", label: "이름", unit: "", type: "text" },
-  { key: "breed" as keyof PetInfo, icon: "activity", label: "견종", unit: "", type: "text" },
+  { key: "breed" as keyof PetInfo, icon: "activity", label: "견종", unit: "", type: "breed" },
   { key: "gender" as keyof PetInfo, icon: "users", label: "성별", unit: "", type: "toggle" },
   { key: "neutered" as keyof PetInfo, icon: "shield", label: "중성화 여부", unit: "", type: "toggle" },
   { key: "age" as keyof PetInfo, icon: "calendar", label: "나이", unit: "살", type: "text" },
   { key: "weight" as keyof PetInfo, icon: "trending-up", label: "체중", unit: "kg", type: "text" },
   { key: "owner" as keyof PetInfo, icon: "user", label: "견주", unit: "", type: "text" },
-  { key: "hospital" as keyof PetInfo, icon: "map-pin", label: "동물병원", unit: "", type: "text" },
-  { key: "birthdate" as keyof PetInfo, icon: "calendar", label: "생년월일", unit: "", type: "text" },
+  { key: "hospital" as keyof PetInfo, icon: "map-pin", label: "동물병원", unit: "", type: "hospital" },
+  { key: "birthdate" as keyof PetInfo, icon: "calendar", label: "생년월일", unit: "", type: "birthdate" },
   { key: "regNumber" as keyof PetInfo, icon: "hash", label: "동물 등록 번호", unit: "", type: "text" },
   { key: "concerns" as keyof PetInfo, icon: "alert-circle", label: "걱정되는 질병", unit: "", type: "multiselect" },
   { key: "foods" as keyof PetInfo, icon: "package", label: "관심있는 기능성 사료", unit: "", type: "multiselect" },
@@ -276,6 +279,37 @@ export default function ProfileScreen() {
                       <Text style={[styles.infoValue, { color: colors.outlineVariant }]}>—</Text>
                     )}
                   </View>
+                )}
+              </View>
+            );
+          }
+
+          // Picker fields (breed, birthdate, hospital) — expand vertically in edit mode
+          if (f.type === "breed" || f.type === "birthdate" || f.type === "hospital") {
+            return (
+              <View key={f.key} style={[styles.infoRow, { flexDirection: "column", alignItems: "flex-start", gap: 6 }, divider]}>
+                <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
+                  <View style={[styles.infoIcon, { backgroundColor: colors.surfaceContainerLow }]}>
+                    <Feather name={f.icon as any} size={16} color={colors.primary} />
+                  </View>
+                  <Text style={[styles.infoLabel, { color: colors.mutedForeground }]}>{f.label}</Text>
+                </View>
+                {editing ? (
+                  <View style={{ width: "100%", paddingBottom: 4 }}>
+                    {f.type === "breed" && (
+                      <BreedPicker value={String(draft.breed || "")} onChange={(v) => setField("breed", v)} colors={colors} />
+                    )}
+                    {f.type === "birthdate" && (
+                      <BirthdatePicker value={String(draft.birthdate || "")} onChange={(v) => setField("birthdate", v)} colors={colors} />
+                    )}
+                    {f.type === "hospital" && (
+                      <HospitalSearch value={String(draft.hospital || "")} onChange={(v) => setField("hospital", v)} colors={colors} />
+                    )}
+                  </View>
+                ) : (
+                  <Text style={[styles.infoValue, { color: colors.foreground, paddingBottom: 4 }]}>
+                    {String(petInfo[f.key] || "—")}
+                  </Text>
                 )}
               </View>
             );
