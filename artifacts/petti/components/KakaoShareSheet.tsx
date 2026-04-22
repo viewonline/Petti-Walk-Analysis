@@ -11,6 +11,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Analysis, mockPet } from "@/data/mockData";
 
 const KAKAO_YELLOW = "#FAE100";
@@ -42,6 +43,10 @@ interface Props {
 
 export function KakaoShareSheet({ visible, onClose, onOpenConsult, analysis, colors }: Props) {
   const [checked, setChecked] = useState<Set<string>>(new Set(["video", "report"]));
+  const insets = useSafeAreaInsets();
+  // Tab bar height: 84px on web, ~49px on native; add safe area bottom on top
+  const tabBarH = Platform.OS === "web" ? 84 : 49;
+  const bottomPad = insets.bottom + tabBarH;
 
   if (!visible || !analysis) return null;
 
@@ -315,7 +320,7 @@ export function KakaoShareSheet({ visible, onClose, onOpenConsult, analysis, col
         </ScrollView>
 
         {/* ── Sticky bottom: share button ── */}
-        <View style={[styles.bottomBar, { borderTopColor: colors.border + "40", backgroundColor: colors.card }]}>
+        <View style={[styles.bottomBar, { borderTopColor: colors.border + "40", backgroundColor: colors.card, paddingBottom: bottomPad }]}>
           <TouchableOpacity
             style={[
               styles.shareBtn,
@@ -469,7 +474,6 @@ const styles = StyleSheet.create({
   bottomBar: {
     borderTopWidth: 1,
     padding: 16,
-    paddingBottom: 28,
     gap: 10,
   },
   shareBtn: {
