@@ -14,7 +14,6 @@ import {
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useColors } from "@/hooks/useColors";
-import { useAuth } from "@/context/AuthContext";
 
 const FIELDS = [
   { key: "name", label: "이름", placeholder: "이름 입력", icon: "user", secure: false, keyboard: "default" as const },
@@ -27,7 +26,6 @@ export default function SignupScreen() {
   const colors = useColors();
   const insets = useSafeAreaInsets();
   const router = useRouter();
-  const { login } = useAuth();
 
   const topPad = Platform.OS === "web" ? Math.max(insets.top, 44) : insets.top;
 
@@ -61,8 +59,8 @@ export default function SignupScreen() {
     setLoading(true);
     setTimeout(() => {
       setLoading(false);
-      login();
-    }, 900);
+      router.push("/(auth)/pet-setup");
+    }, 600);
   };
 
   return (

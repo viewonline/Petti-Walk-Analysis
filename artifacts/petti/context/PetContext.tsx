@@ -3,6 +3,7 @@ import React, { createContext, useContext, useState } from "react";
 export interface PetInfo {
   name: string;
   breed: string;
+  gender: string;
   age: string;
   weight: string;
   owner: string;
@@ -12,6 +13,7 @@ export interface PetInfo {
 const DEFAULT_PET: PetInfo = {
   name: "올리버",
   breed: "골든 리트리버",
+  gender: "수컷",
   age: "6",
   weight: "28.5",
   owner: "김민준",

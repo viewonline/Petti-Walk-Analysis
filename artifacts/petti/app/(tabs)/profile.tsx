@@ -20,6 +20,7 @@ import { useAuth } from "@/context/AuthContext";
 const FIELDS = [
   { key: "name" as keyof PetInfo, icon: "tag", label: "이름", unit: "" },
   { key: "breed" as keyof PetInfo, icon: "activity", label: "견종", unit: "" },
+  { key: "gender" as keyof PetInfo, icon: "users", label: "성별", unit: "" },
   { key: "age" as keyof PetInfo, icon: "calendar", label: "나이", unit: "살" },
   { key: "weight" as keyof PetInfo, icon: "trending-up", label: "체중", unit: "kg" },
   { key: "owner" as keyof PetInfo, icon: "user", label: "견주", unit: "" },
