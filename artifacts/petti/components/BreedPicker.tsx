@@ -1,107 +1,158 @@
 import { Feather } from "@expo/vector-icons";
-import React, { useState } from "react";
+import * as Haptics from "expo-haptics";
+import React, { useEffect, useRef, useState } from "react";
 import {
-  FlatList,
   StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
   View,
 } from "react-native";
-import { DOG_BREEDS } from "@/data/breeds";
+
+const QUICK_BREEDS = [
+  "말티즈",
+  "푸들",
+  "포메라니안",
+  "시츄",
+  "골든 리트리버",
+  "래브라도",
+  "비글",
+  "치와와",
+  "진돗개",
+  "보더콜리",
+  "웰시코기",
+  "닥스훈트",
+  "말티푸",
+  "믹스견",
+];
+
+const CUSTOM_KEY = "__custom__";
 
 interface Props {
   value: string;
   onChange: (breed: string) => void;
   colors: any;
-  placeholder?: string;
 }
 
-export function BreedPicker({ value, onChange, colors, placeholder = "견종을 선택하거나 검색하세요" }: Props) {
-  const [open, setOpen] = useState(false);
-  const [search, setSearch] = useState("");
+export function BreedPicker({ value, onChange, colors }: Props) {
+  const isCustom = value !== "" && !QUICK_BREEDS.includes(value);
+  const [customMode, setCustomMode] = useState(isCustom);
+  const [customText, setCustomText] = useState(isCustom ? value : "");
+  const inputRef = useRef<TextInput>(null);
 
-  const filtered = search.trim()
-    ? DOG_BREEDS.filter((b) => b.includes(search))
-    : DOG_BREEDS;
+  useEffect(() => {
+    if (customMode) {
+      setTimeout(() => inputRef.current?.focus(), 100);
+    }
+  }, [customMode]);
 
-  const select = (breed: string) => {
-    onChange(breed);
-    setOpen(false);
-    setSearch("");
+  const selectChip = (breed: string) => {
+    Haptics.selectionAsync();
+    if (breed === CUSTOM_KEY) {
+      setCustomMode(true);
+      onChange(customText.trim() || "");
+    } else {
+      setCustomMode(false);
+      setCustomText("");
+      onChange(breed);
+    }
   };
 
-  return (
-    <View>
-      <TouchableOpacity
-        style={[
-          styles.trigger,
-          {
-            backgroundColor: colors.surfaceContainerLow,
-            borderColor: open ? colors.primary : colors.border + "60",
-          },
-        ]}
-        onPress={() => setOpen((o) => !o)}
-        activeOpacity={0.8}
-      >
-        <Text style={[styles.triggerText, { color: value ? colors.foreground : colors.outlineVariant }]}>
-          {value || placeholder}
-        </Text>
-        <Feather
-          name={open ? "chevron-up" : "chevron-down"}
-          size={16}
-          color={colors.mutedForeground}
-        />
-      </TouchableOpacity>
+  const activeChip = customMode ? CUSTOM_KEY : value;
 
-      {open && (
-        <View style={[styles.dropdown, { backgroundColor: colors.card, borderColor: colors.border + "60" }]}>
-          <View style={[styles.searchRow, { borderBottomColor: colors.border + "40" }]}>
-            <Feather name="search" size={14} color={colors.mutedForeground} />
-            <TextInput
-              style={[styles.searchInput, { color: colors.foreground }]}
-              value={search}
-              onChangeText={setSearch}
-              placeholder="검색..."
-              placeholderTextColor={colors.outlineVariant}
-              autoFocus
-            />
-            {search !== "" && (
-              <TouchableOpacity onPress={() => setSearch("")}>
-                <Feather name="x" size={14} color={colors.mutedForeground} />
-              </TouchableOpacity>
-            )}
-          </View>
-          <FlatList
-            data={filtered}
-            keyExtractor={(item) => item}
-            style={styles.list}
-            keyboardShouldPersistTaps="handled"
-            renderItem={({ item }) => {
-              const selected = item === value;
-              return (
-                <TouchableOpacity
-                  style={[
-                    styles.option,
-                    { borderBottomColor: colors.border + "30" },
-                    selected && { backgroundColor: colors.primaryFixed },
-                  ]}
-                  onPress={() => select(item)}
-                  activeOpacity={0.7}
-                >
-                  <Text
-                    style={[
-                      styles.optionText,
-                      { color: selected ? colors.primary : colors.foreground },
-                    ]}
-                  >
-                    {item}
-                  </Text>
-                  {selected && <Feather name="check" size={14} color={colors.primary} />}
-                </TouchableOpacity>
-              );
-            }}
+  return (
+    <View style={styles.container}>
+      <View style={styles.chipGrid}>
+        {QUICK_BREEDS.map((breed) => {
+          const selected = activeChip === breed;
+          return (
+            <TouchableOpacity
+              key={breed}
+              style={[
+                styles.chip,
+                {
+                  backgroundColor: selected ? colors.primary : colors.card,
+                  borderColor: selected ? colors.primary : colors.border + "80",
+                },
+              ]}
+              onPress={() => selectChip(breed)}
+              activeOpacity={0.75}
+            >
+              <Text
+                style={[
+                  styles.chipText,
+                  { color: selected ? "#fff" : colors.foreground },
+                ]}
+              >
+                {breed}
+              </Text>
+            </TouchableOpacity>
+          );
+        })}
+
+        {/* 직접 입력 chip */}
+        <TouchableOpacity
+          style={[
+            styles.chip,
+            {
+              backgroundColor: customMode ? colors.primary : colors.card,
+              borderColor: customMode ? colors.primary : colors.border + "80",
+            },
+          ]}
+          onPress={() => selectChip(CUSTOM_KEY)}
+          activeOpacity={0.75}
+        >
+          <Feather
+            name="edit-2"
+            size={13}
+            color={customMode ? "#fff" : colors.mutedForeground}
+            style={{ marginRight: 4 }}
           />
+          <Text
+            style={[
+              styles.chipText,
+              { color: customMode ? "#fff" : colors.foreground },
+            ]}
+          >
+            직접 입력
+          </Text>
+        </TouchableOpacity>
+      </View>
+
+      {/* 직접 입력 텍스트 필드 */}
+      {customMode && (
+        <View
+          style={[
+            styles.customInputWrap,
+            {
+              borderColor: colors.primary,
+              backgroundColor: colors.surfaceContainerLow,
+            },
+          ]}
+        >
+          <Feather name="search" size={14} color={colors.mutedForeground} style={{ marginRight: 6 }} />
+          <TextInput
+            ref={inputRef}
+            style={[styles.customInput, { color: colors.foreground }]}
+            value={customText}
+            onChangeText={(t) => {
+              setCustomText(t);
+              onChange(t.trim());
+            }}
+            placeholder="견종을 직접 입력하세요"
+            placeholderTextColor={colors.outlineVariant}
+            returnKeyType="done"
+          />
+          {customText !== "" && (
+            <TouchableOpacity
+              onPress={() => {
+                setCustomText("");
+                onChange("");
+              }}
+            >
+              <Feather name="x" size={14} color={colors.mutedForeground} />
+            </TouchableOpacity>
+          )}
         </View>
       )}
     </View>
@@ -109,45 +160,37 @@ export function BreedPicker({ value, onChange, colors, placeholder = "견종을 
 }
 
 const styles = StyleSheet.create({
-  trigger: {
+  container: { gap: 10 },
+  chipGrid: {
     flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    paddingHorizontal: 12,
-    paddingVertical: 10,
-    borderRadius: 10,
-    borderWidth: 1,
-    marginTop: 4,
-  },
-  triggerText: { fontSize: 15, fontWeight: "500", flex: 1 },
-  dropdown: {
-    borderRadius: 12,
-    borderWidth: 1,
-    marginTop: 4,
-    overflow: "hidden",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.08,
-    shadowRadius: 6,
-    elevation: 3,
-  },
-  searchRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingHorizontal: 12,
-    paddingVertical: 10,
+    flexWrap: "wrap",
     gap: 8,
-    borderBottomWidth: 1,
   },
-  searchInput: { flex: 1, fontSize: 14, fontWeight: "500" },
-  list: { maxHeight: 200 },
-  option: {
+  chip: {
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "space-between",
     paddingHorizontal: 14,
-    paddingVertical: 11,
-    borderBottomWidth: 1,
+    paddingVertical: 9,
+    borderRadius: 50,
+    borderWidth: 1.5,
   },
-  optionText: { fontSize: 14, fontWeight: "500" },
+  chipText: {
+    fontSize: 14,
+    fontWeight: "500",
+    letterSpacing: -0.2,
+  },
+  customInputWrap: {
+    flexDirection: "row",
+    alignItems: "center",
+    borderWidth: 1.5,
+    borderRadius: 12,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    gap: 4,
+  },
+  customInput: {
+    flex: 1,
+    fontSize: 14,
+    fontWeight: "500",
+  },
 });
